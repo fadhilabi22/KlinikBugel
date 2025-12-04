@@ -1,0 +1,18 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Ganti '/Sistem_Klinik/' sesuai nama folder proyek Anda
+    RewriteBase /Sistem_Klinik/ 
+
+    # Untuk menghilangkan index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php/$1 [L]
+</IfModule>
+
+# Bagian ini jarang digunakan di CI3, tapi tidak salah.
+# Fungsinya: Jika mod_rewrite tidak aktif, kirim 404 ke index.php 
+# Ini tidak membantu menghilangkan index.php dari URL.
+<IfModule !mod_rewrite.c>
+    ErrorDocument 404 /index.php
+</IfModule>
