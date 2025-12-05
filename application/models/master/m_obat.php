@@ -35,4 +35,11 @@ class M_Obat extends CI_Model {
     public function get_total_obat() {
         return $this->db->count_all_results($this->table);
     }
+    
+    public function search_obat($keyword) {
+        $this->db->like('nama_obat', $keyword);
+        $this->db->or_like('satuan', $keyword);     // opsional
+        $this->db->or_like('harga_jual', $keyword); // opsional
+        return $this->db->get($this->table)->result();
+    }
 }

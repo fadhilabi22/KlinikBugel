@@ -35,4 +35,12 @@ class m_pasien extends CI_Model {
     public function get_total_pasien() {
         return $this->db->count_all_results($this->table);
     }
+
+    public function search($keyword) {
+        $this->db->like('nama_pasien', $keyword);
+        $this->db->or_like('no_telp', $keyword);
+        $this->db->or_like('alamat', $keyword);
+        return $this->db->get($this->table)->result();
+    }
+
 }

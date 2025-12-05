@@ -9,6 +9,22 @@
             </div>
         <?php endif; ?>
         
+   <form method="GET" action="<?php echo site_url('master/pasien'); ?>" class="form-inline mb-3">
+        <input type="text" name="keyword" class="form-control mr-2" 
+            placeholder="Cari nama pasien..." 
+            value="<?php echo isset($_GET['keyword']) ? $_GET['keyword'] : ''; ?>">
+
+        <button type="submit" class="btn btn-info">
+            <i class="fa fa-search"></i> Cari
+        </button>
+
+        <?php if (isset($_GET['keyword']) && $_GET['keyword'] != ''): ?>
+            <a href="<?php echo site_url('master/pasien'); ?>" class="btn btn-secondary ml-2">
+                Reset
+            </a>
+        <?php endif; ?>
+    </form>
+
         <a href="<?php echo site_url('master/pasien/input'); ?>" class="btn btn-primary mb-3">
             <i class="fa fa-user-plus"></i> Tambah Pasien Baru
         </a>

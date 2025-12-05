@@ -12,11 +12,23 @@ class obat extends CI_Controller {
 
     // READ
     public function index() {
+
+        // Ambil keyword dari GET
+        $keyword = $this->input->get('keyword');
+
+        if (!empty($keyword)) {
+            $obat = $this->M_Obat->search_obat($keyword);
+        } else {
+            $obat = $this->M_Obat->get_all();
+        }
+
         $data = [
             'title'     => 'Data Obat & Manajemen Stok',
             'contents'  => 'master/obat/lihat_data',
-            'obat'      => $this->M_Obat->get_all()
+            'obat'      => $obat,
+            'keyword'   => $keyword
         ];
+
         $this->template->load('template', $data['contents'], $data);
     }
 

@@ -530,29 +530,5 @@ input[type="submit"]:active {
     .copy-right {
         margin: 2em auto 1em;
     }
-    /* Style untuk error message validation */
-        .error-message {
-            color: #991B1B;
-            font-size: 0.85em;
-            margin-top: -15px;
-            margin-bottom: 10px;
-            display: none;
-            font-weight: 500;
-            animation: shakeError 0.3s ease;
-        }
-        
-        .error-message.show {
-            display: block;
-        }
-        
-        .input-error {
-            border-color: #EF4444 !important;
-            background: #FEF2F2 !important;
-        }
-        
-        @keyframes shakeError {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
+    
 }

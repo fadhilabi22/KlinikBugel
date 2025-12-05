@@ -13,15 +13,25 @@ class pasien extends CI_Controller {
 
     // R - READ (Menampilkan Tabel Pasien)
     public function index() {
-        // chek_session(); // Cek Login
-        
-        $data = [
-            'title'     => 'Data Master Pasien',
-            'contents'  => 'master/pasien/lihat_data', // Memuat view tabel
-            'pasien'    => $this->M_Pasien->get_all() // Ambil semua data
-        ];
-        $this->template->load('template', $data['contents'], $data);
+
+    // Ambil kata kunci pencarian dari GET
+    $keyword = $this->input->get('keyword');
+
+    if ($keyword) {
+        // Jika ada keyword → jalankan pencarian
+        $data['pasien'] = $this->M_Pasien->search($keyword);
+    } else {
+        // Jika tidak ada keyword → tampilkan semua data
+        $data['pasien'] = $this->M_Pasien->get_all();
     }
+
+    $data['title']     = 'Data Master Pasien';
+    $data['keyword']   = $keyword;
+    $data['contents']  = 'master/pasien/lihat_data';
+
+    $this->template->load('template', $data['contents'], $data);
+}
+
 
     // C - CREATE (Menampilkan Form Input)
     public function input() {

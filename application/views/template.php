@@ -84,6 +84,23 @@
         <!-- CONTENT -->
         <div id="page-wrapper">
             <div id="page-inner">
+
+                <!-- FLASHDATA SUCCESS -->
+                <?php if ($this->session->flashdata('success')): ?>
+                    <div class="alert alert-success alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <?= $this->session->flashdata('success') ?>
+                    </div>
+                <?php endif; ?>
+
+                <!-- FLASHDATA ERROR -->
+                <?php if ($this->session->flashdata('error')): ?>
+                    <div class="alert alert-danger alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <?= $this->session->flashdata('error') ?>
+                    </div>
+                <?php endif; ?>
+
                 <?= $contents; ?>
             </div>
         </div>

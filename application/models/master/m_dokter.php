@@ -34,4 +34,17 @@ class m_dokter extends CI_Model {
     public function get_total_dokter() {
         return $this->db->count_all_results($this->table);
     }
+
+   public function search($keyword)
+{
+    $keyword = strtolower($keyword);
+
+    $this->db->where("LOWER(nama_dokter) LIKE '%$keyword%' 
+                    OR LOWER(spesialisasi) LIKE '%$keyword%' 
+                    OR LOWER(no_izin) LIKE '%$keyword%'");
+
+    return $this->db->get($this->table)->result();
+}
+
+
 }

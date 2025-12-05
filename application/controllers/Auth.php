@@ -25,37 +25,42 @@ class Auth extends CI_Controller {
 
     // FUNGSI UTAMA: Proses Login
     public function login_proses()
-    {
-        $this->form_validation->set_rules('username', 'Username', 'required|trim');
-        $this->form_validation->set_rules('password', 'Password', 'required|trim');
-        $this->form_validation->set_message('required', '%s harus diisi.');
+{
+    $this->form_validation->set_rules('username', 'Username', 'required|trim');
+    $this->form_validation->set_rules('password', 'Password', 'required|trim');
+    $this->form_validation->set_message('required', '%s harus diisi.');
 
-        if ($this->form_validation->run() == FALSE) {
-            $this->index(); 
+    if ($this->form_validation->run() == FALSE) {
+        $this->load->view('auth/login');
+    } else {
+
+        $username = $this->input->post('username', TRUE);
+        $password = $this->input->post('password', TRUE);
+
+        $cek_user = $this->M_Auth->cek_login($username, $password);
+
+        if ($cek_user->num_rows() > 0) {
+
+            $user = $cek_user->row();
+
+            $session_data = [
+                'id_pengguna'  => $user->id_pengguna,
+                'username'     => $user->username,
+                'nama_lengkap' => $user->nama_lengkap,
+                'logged_in'    => TRUE
+            ];
+
+            $this->session->set_userdata($session_data);
+
+            redirect('dashboard');
+
         } else {
-            $username = $this->input->post('username', TRUE);
-            $password = $this->input->post('password', TRUE);
-
-            $cek_user = $this->M_Auth->cek_login($username, $password);
-
-            if ($cek_user->num_rows() > 0) {
-                // Berhasil Login
-                $user_data = $cek_user->row();
-                $session_data = array(
-                    'id_pengguna'  => $user_data->id_pengguna,
-                    'username'     => $user_data->username,
-                    'nama_lengkap' => $user_data->nama_lengkap, 
-                    'logged_in'    => TRUE
-                );
-                $this->session->set_userdata($session_data);
-                redirect('dashboard');
-            } else {
-                // Gagal Login
-                $this->session->set_flashdata('error', 'Username atau Password salah!');
-                redirect('auth');
-            }
+            $this->session->set_flashdata('error', 'Username atau Password salah!');
+            redirect('auth');
         }
     }
+}
+
 
     // FUNGSI BARU: Menampilkan Form Registrasi
     public function regis() 
