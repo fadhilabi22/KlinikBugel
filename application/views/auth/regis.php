@@ -15,7 +15,7 @@
     <script>
         function myFunction()
         {
-            alert("Proses Registrasi Berhasil")
+            alert("Proses Registrasi...")
         }
     </script>
 </head>

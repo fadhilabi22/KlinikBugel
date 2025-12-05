@@ -1,287 +1,558 @@
-/* start editing from here */
-html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,dl,dt,dd,ol,nav ul,nav li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;}
-article, aside, details, figcaption, figure,footer, header, hgroup, menu, nav, section {display: block;}
-ol,ul{list-style:none;margin:0px;padding:0px;}
-blockquote,q{quotes:none;}
-blockquote:before,blockquote:after,q:before,q:after{content:'';content:none;}
-table{border-collapse:collapse;border-spacing:0;}
+/* ================================
+   CSS RESET
+================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-/* start editing from here */
-a{text-decoration:none;}
-.txt-rt{text-align:right;}
-.txt-lt{text-align:left;}
-.txt-center{text-align:center;}
-.float-rt{float:right;}
-.float-lt{float:left;}
-.clear{clear:both;}
-.pos-relative{position:relative;}
-.pos-absolute{position:absolute;}
-.vertical-base{ vertical-align:baseline;}
-.vertical-top{ vertical-align:top;}
-nav.vertical ul li{ display:block;}
-nav.horizontal ul li{ display: inline-block;}
-img{max-width:100%;}
-/*end reset*/
+html, body {
+    height: 100%;
+    width: 100%;
+}
 
-/****-----start-body----****/
-body{
-/* DIUBAH: Warna background ke abu-abu kebiruan yang lebih tenang */
-background-color:#DCE6F0; 
+body {
+    background: linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 50%, #80CBC4 100%);
+    font-family: 'Segoe UI', 'Inter', 'Open Sans', Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow-x: hidden;
 }
-.main{
- margin:7em auto 0;
-width: 30%;
+
+/* Animated medical background pattern */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
+    animation: floatPattern 20s ease-in-out infinite;
+    z-index: 0;
+    pointer-events: none;
 }
-.user {
-text-align: right;
-vertical-align: middle;
-margin-right: 5.2em;
+
+@keyframes floatPattern {
+    0%, 100% { opacity: 1; transform: translateY(0); }
+    50% { opacity: 0.8; transform: translateY(-20px); }
 }
-.login{
-padding:2em 0;
-}
-.inset {
-position:relative;
-background: #fff;
-padding: 2em 2em;
-border-radius: 0.5em; /* Sudut halus */
-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow lembut */
--webkit-border-radius: 0.5em;
--o-border-radius: 0.5em;
--moz-border-radius: 0.5em;
-}
-.inset:before{
-content: '';
-width: 0;
-height: 0;
-border: 20px solid #FFF;
-border-top: 0 solid rgba(0, 0, 0, 0)!important;
-border-right: 13px solid rgba(0, 0, 0, 0)!important;
-border-left: 13px solid rgba(0, 0, 0, 0);
-left: 77.1%;
-top: -5.3%;
-position: absolute;
-}
-form span {
-display: block;
-font-size: 1em;
-color: #555; /* Warna teks lebih netral */
-padding-bottom: 5px;
-font-weight: 600;
-font-family: 'Open Sans', sans-serif;
-}
-input[type="text"],input[type="Password"] {
- padding: 10px; 
-width: 90%;
-font-size: 1em;
-margin: 15px 0px; 
-border: 1px solid #C0D0E0; /* Border netral */
-color: #333;
-background:#F0F4F8; 
-font-family: 'Open Sans', sans-serif;
-font-weight:400; 
-margin-left: 5px;
-outline:none;
-border-radius: 4px; /* Sudut melengkung */
--webkit-transition: all 0.3s ease-out;
--moz-transition: all 0.3s ease-out;
- -ms-transition: all 0.3s ease-out;
--o-transition: all 0.3s ease-out;
-transition: all 0.3s ease-out;
-}
-input[type="text"]:hover,input[type="Password"]:hover,#active{
-background:#fff;
-border:2px solid #20A4F3; /* Fokus Biru Aksi */
-outline:none;
-}
-.sign {
-padding: 10px 0;
-}
-.forget-pass {
-float: right;
-}
-.submit {
-padding: 2px 2px;
- float:left;
-margin-right: 11px;
-}
-.submit input[type="submit"] {
- /* Tombol Aksi: Biru */
-background: #20A4F3;
- border: none;
-outline: none;
-padding: 0.6em 1.5em 0.7em;
-cursor: pointer;
-font-family: 'Open Sans', sans-serif;
-color: #FFF;
-font-size: 0.95em;
- border-radius: 0.3em; 
-transition: 0.5s all;
--webkit-transition: 0.5s all;
- -moz-transition: 0.5s all;
- -o-transition: 0.5s all;
-font-weight: 600;
-}
-.submit input[type="submit"]:hover{
-background:#12C4B7; /* Hover: Hijau Teal */
-}
-.forget{
- float:right;
-}
-.forget-pass a {
-float: right;
-color:#20A4F3; /* Warna link ke Biru Aksi */
- font-size: 0.95em;
- margin-top: 13px;
-transition: 0.5s all;
--webkit-transition: 0.5s all;
--moz-transition: 0.5s all;
--o-transition: 0.5s all;
- font-weight: 600;
-font-family: 'Open Sans', sans-serif;
-}
-.forget-pass a:hover {
- text-decoration: none; /* Hilangkan underline */
-    color: #12C4B7; /* Warna hover link */
-}
-.copy-right {
- text-align: center;
-width: 97%;
-margin: 2em auto 0;
-}
-.copy-right p {
-color: #333; /* Warna teks lebih gelap agar terlihat */
-font-size: 1em;
-font-family: 'Open Sans', sans-serif;
-}
-.copy-right p a {
-font-family: 'Open Sans', sans-serif;
- font-size: 1em;
-font-weight: 600;
-color: #20A4F3; /* Warna link di footer */
--webkit-transition: all 0.3s ease-out;
--moz-transition: all 0.3s ease-out;
--ms-transition: all 0.3s ease-out;
--o-transition: all 0.3s ease-out;
-transition: all 0.3s ease-out;
-}
-.copy-right p a:hover {
-color:#12C4B7; /* Warna hover link di footer */
-}
-/*----start-responsive design-----*/
-@media (max-width:1440px){
-main {
-width:33%;
- margin: 7em auto 0;
-}
-user {
-margin-right: 4.2em;
-}
-inset:before {
-left: 80%;
-top: -5.3%;
-}
-}
-@media (max-width:1366px){
+
+/* ================================
+   MAIN CONTAINER
+================================ */
 .main {
-width:36%;
+    width: 440px;
+    max-width: 90%;
+    position: relative;
+    z-index: 1;
+    animation: slideIn 0.6s ease-out;
 }
-.inset:before {
-left: 80%;
-top: -5%;
-}
-}
-@media (max-width:1280px){
-main {
-width:40%;
-}
-user {
-margin-right: 5.2em;
-}
-inset:before {
-left: 78.3%;
-top: -5.4%;
-}
-input[type="text"], input[type="Password"] {
-padding: 9px;
-width: 93%;
-}
-}
-@media (max-width:1024px){
-.main {
-width:48%;
-margin: 8em auto 0;
-}
-.inset:before {
-left: 77.2%;
-top: -5.4%;
-}
-}
-@media (max-width:768px){
-.main {
-width:59%;
- }
-.inset:before {
- left: 75.3%;
- top: -5.4%;
-}
-}
-@media (max-width:640px){
-.main {
- width:67%;
-}
- .inset:before {
-left: 74.2%;
-top: -5.4%;
- }
-}
-@media (max-width:480px){
- .main {
-width:80%;
-margin: 3em auto 0;
-.user {
-margin-right: 4.2em;
- }
- .inset:before {
-left: 74.2%;
-top: -5.4%;
- }
-    input[type="text"], input[type="Password"] {
-    padding: 8px;
-    margin: 10px 0px;
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
-@media (max-width:320px){
-.main {
- width: 97%;
-margin: 2em auto 0;
- }
-.inset:before {
-left: 67%;
-top: -4.4%;
-}  
+
+/* ================================
+   MEDICAL LOGO/BRAND
+================================ */
 .user {
-margin-right: 4.2em;
+    text-align: center;
+    margin-bottom: 2em;
+    position: relative;
 }
- .login {
-padding: 1em 0;
- }
- .submit {
-padding: 2px ;
- text-align: center;
- float:none;
- }
+
+.user::before {
+    content: "⚕";
+    font-size: 4.5rem;
+    color: #0F766E;
+    display: block;
+    margin-bottom: 0.5rem;
+    animation: pulse 2s ease-in-out infinite;
+    text-shadow: 0 4px 12px rgba(15, 118, 110, 0.3);
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.user h2 {
+    color: #0F766E;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 0;
+}
+
+.user p {
+    color: #334155;
+    font-size: 1rem;
+    margin-top: 0.4rem;
+    font-weight: 500;
+}
+
+/* Hide default image if exists */
+.user img {
+    display: none !important;
+}
+
+/* ================================
+   LOGIN CARD
+================================ */
+.login {
+    padding: 0;
+}
+
+.inset {
+    position: relative;
+    background: #FFFFFF;
+    padding: 3em 2.8em;
+    border-radius: 20px;
+    box-shadow: 
+        0 10px 40px rgba(15, 118, 110, 0.15),
+        0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.inset:hover {
+    box-shadow: 
+        0 15px 50px rgba(15, 118, 110, 0.2),
+        0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+}
+
+/* Top accent line */
+.inset::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #0F766E 0%, #14B8A6 50%, #5EEAD4 100%);
+    border-radius: 20px 20px 0 0;
+}
+
+/* Medical icon watermark */
+.inset::after {
+    content: "⚕";
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    font-size: 180px;
+    color: #F0FDFA;
+    opacity: 0.4;
+    z-index: 0;
+    transform: rotate(15deg);
+    pointer-events: none;
+}
+
+.inset > * {
+    position: relative;
+    z-index: 1;
+}
+
+.inset form {
+    position: relative;
+    z-index: 1;
+}
+
+.inset form > div {
+    position: relative;
+    z-index: 1;
+}
+
+/* ================================
+   FORM LABELS
+================================ */
+form span label,
+form label {
+    display: block;
+    font-size: 0.95em;
+    color: #334155;
+    padding-bottom: 8px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* ================================
+   FORM INPUTS
+================================ */
+input[type="text"],
+input[type="password"],
+input.textbox,
+input.password {
+    padding: 14px 16px !important;
+    width: 100% !important;
+    font-size: 1em !important;
+    margin: 8px 0 20px 0 !important;
+    border: 2px solid #CBD5E1 !important;
+    color: #1E293B !important;
+    background: #F8FAFC !important;
+    font-family: 'Segoe UI', 'Inter', 'Open Sans', Arial, sans-serif !important;
+    font-weight: 400 !important;
+    outline: none !important;
+    border-radius: 10px !important;
+    transition: all 0.3s ease !important;
+    box-sizing: border-box !important;
+}
+
+input[type="text"]:hover,
+input[type="password"]:hover,
+input.textbox:hover,
+input.password:hover {
+    background: #FFFFFF !important;
+    border-color: #94A3B8 !important;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input.textbox:focus,
+input.password:focus,
+#active {
+    background: #FFFFFF !important;
+    border: 2px solid #14B8A6 !important;
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.15) !important;
+    outline: none !important;
+}
+
+/* ================================
+   FORM ACTIONS CONTAINER
+================================ */
+.sign {
+    padding: 10px 0 5px 0;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.submit {
+    padding: 0;
+    margin: 0;
+    flex: 1;
+    min-width: 150px;
+}
+
+/* ================================
+   SUBMIT BUTTON
+================================ */
+.submit input[type="submit"],
+input[type="submit"] {
+    background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%) !important;
+    border: none !important;
+    outline: none !important;
+    padding: 1em 2em !important;
+    width: 100% !important;
+    cursor: pointer !important;
+    font-family: 'Segoe UI', 'Inter', 'Open Sans', Arial, sans-serif !important;
+    color: #FFFFFF !important;
+    font-size: 1rem !important;
+    border-radius: 10px !important;
+    transition: all 0.3s ease !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 15px rgba(15, 118, 110, 0.3) !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase;
+}
+
+.submit input[type="submit"]:hover,
+input[type="submit"]:hover {
+    background: linear-gradient(135deg, #0D9488 0%, #2DD4BF 100%) !important;
+    box-shadow: 0 6px 20px rgba(15, 118, 110, 0.4) !important;
+    transform: translateY(-2px);
+}
+
+.submit input[type="submit"]:active,
+input[type="submit"]:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(15, 118, 110, 0.3) !important;
+}
+
+/* ================================
+   FORGOT PASSWORD SECTION
+================================ */
+.forget {
+    flex: 0;
+    display: flex;
+    align-items: center;
+}
+
 .forget-pass {
-float:none;
-text-align:center;
-margin-top: 15px
+    margin: 0;
+    display: inline-block;
 }
+
 .forget-pass a {
-float:none;
+    color: #0F766E !important;
+    font-size: 0.92em;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    display: inline-block;
+    position: relative;
+    padding-bottom: 2px;
+    text-decoration: none !important;
 }
-input[type="text"], input[type="Password"] {
- padding: 6px;
- margin: 9px 0px;
- }
+
+.forget-pass a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #14B8A6;
+    transition: width 0.3s ease;
 }
+
+.forget-pass a:hover {
+    color: #14B8A6 !important;
+    text-decoration: none !important;
+}
+
+.forget-pass a:hover::after {
+    width: 100%;
+}
+
+/* ================================
+   ALERT MESSAGES
+================================ */
+.alert {
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 0.92em;
+    font-weight: 500;
+    border-left: 4px solid;
+}
+
+.alert-error {
+    background: #FEE2E2;
+    color: #991B1B;
+    border-left-color: #EF4444;
+}
+
+.alert-success {
+    background: #ECFDF5;
+    color: #065F46;
+    border-left-color: #10B981;
+}
+
+.alert-info {
+    background: #F0FDFA;
+    color: #134E4A;
+    border-left-color: #14B8A6;
+}
+
+/* ================================
+   REGISTER LINK SECTION
+================================ */
+.inset form > div:last-child {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #E2E8F0;
+}
+
+.inset form > div:last-child span {
+    color: #64748B;
+    font-size: 0.9em;
+    font-weight: 400;
+}
+
+.inset form > div:last-child a {
+    color: #0F766E !important;
+    font-weight: 600;
+    transition: 0.3s;
+    text-decoration: none !important;
+}
+
+.inset form > div:last-child a:hover {
+    color: #14B8A6 !important;
+}
+
+/* ================================
+   COPYRIGHT FOOTER
+================================ */
+.copy-right {
+    text-align: center;
+    width: 100%;
+    margin: 2.5em auto 1.5em;
+    position: relative;
+    z-index: 1;
+}
+
+.copy-right p {
+    color: #334155;
+    font-size: 0.92em;
+    font-weight: 500;
+}
+
+.copy-right p a {
+    font-size: 1em;
+    font-weight: 700;
+    color: #0F766E !important;
+    transition: all 0.3s ease;
+    padding-bottom: 2px;
+    border-bottom: 2px solid transparent;
+    text-decoration: none !important;
+}
+
+.copy-right p a:hover {
+    color: #14B8A6 !important;
+    border-bottom-color: #14B8A6;
+}
+
+/* ================================
+   UTILITY CLASSES
+================================ */
+.clear {
+    clear: both;
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+================================ */
+@media (max-width: 768px) {
+    .main {
+        width: 90%;
+        max-width: 450px;
+    }
+    
+    .inset {
+        padding: 2.5em 2em;
+    }
+    
+    .user h2 {
+        font-size: 1.7rem;
+    }
+    
+    .sign {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .submit {
+        width: 100%;
+        margin: 0;
+    }
+    
+    .forget {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .main {
+        width: 95%;
+    }
+    
+    .inset {
+        padding: 2em 1.5em;
+    }
+    
+    .user::before {
+        font-size: 3.5rem;
+    }
+    
+    .user h2 {
+        font-size: 1.5rem;
+    }
+    
+    .user p {
+        font-size: 0.9rem;
+    }
+    
+    input[type="text"],
+    input[type="password"],
+    input.textbox,
+    input.password {
+        padding: 12px 14px !important;
+        font-size: 0.95em !important;
+    }
+    
+    .submit input[type="submit"],
+    input[type="submit"] {
+        padding: 0.9em 1.5em !important;
+        font-size: 0.95rem !important;
+    }
+}
+
+@media (max-width: 375px) {
+    .inset {
+        padding: 1.8em 1.2em;
+    }
+    
+    .user::before {
+        font-size: 3rem;
+    }
+    
+    .user h2 {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 320px) {
+    input[type="text"],
+    input[type="password"],
+    input.textbox,
+    input.password {
+        padding: 10px 12px !important;
+        margin: 6px 0 15px 0 !important;
+    }
+    
+    .submit input[type="submit"],
+    input[type="submit"] {
+        padding: 0.8em 1.2em !important;
+    }
+    
+    .copy-right {
+        margin: 2em auto 1em;
+    }
+    /* Style untuk error message validation */
+        .error-message {
+            color: #991B1B;
+            font-size: 0.85em;
+            margin-top: -15px;
+            margin-bottom: 10px;
+            display: none;
+            font-weight: 500;
+            animation: shakeError 0.3s ease;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .input-error {
+            border-color: #EF4444 !important;
+            background: #FEF2F2 !important;
+        }
+        
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
 }
