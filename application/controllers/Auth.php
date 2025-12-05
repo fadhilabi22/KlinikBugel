@@ -13,7 +13,6 @@ class Auth extends CI_Controller {
     }
 
     // Fungsi Default: Menampilkan Form Login
-    // Dipanggil oleh default_controller atau base_url('auth')
     public function index()
     {
         // Cek jika sudah login
@@ -59,7 +58,7 @@ class Auth extends CI_Controller {
     }
 
     // FUNGSI BARU: Menampilkan Form Registrasi
-    public function regis() // ✅ Sesuai dengan nama file: auth/regis.php
+    public function regis() 
     {
         // ✅ Memuat file: application/views/auth/regis.php
         $this->load->view('auth/regis'); 
@@ -102,7 +101,7 @@ class Auth extends CI_Controller {
     }
     
     // FUNGSI BARU: Menampilkan Form Reset Password
-    public function reset() // ✅ Sesuai dengan nama file: auth/reset.php
+    public function reset() 
     {
         // ✅ Memuat file: application/views/auth/reset.php
         $this->load->view('auth/reset');

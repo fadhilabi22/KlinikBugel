@@ -21,7 +21,7 @@ class m_auth extends CI_Model {
     
     // FUNGSI BARU: Untuk menyimpan data registrasi user baru
     public function register_user($data) {
-        // Data sudah di-hash di Controller, tinggal di-insert
+        
         return $this->db->insert('tbl_pengguna', $data);
     }
 

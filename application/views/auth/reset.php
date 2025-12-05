@@ -15,7 +15,7 @@
     <script>
         function myFunction()
         {
-            alert("Proses Mengubah Password Berhasil")
+            alert("Proses Mengubah Password...")
         }
     </script>
 </head>
