@@ -52,7 +52,7 @@
                             <li><a href="<?= base_url('master/pasien') ?>"><i class="fa fa-users"></i> Data Pasien</a></li>
                             <li><a href="<?= base_url('master/dokter') ?>"><i class="fa fa-user-md"></i> Data Dokter</a></li>
                             <li><a href="<?= base_url('master/obat') ?>"><i class="fa fa-medkit"></i> Data Obat/Stok</a></li>
-                            <li><a href="<?= base_url('master/poli') ?>"><i class="fa fa-hospital-o"></i> Data Poli</a></li>
+                            <li><a href="<?= base_url('master/poli') ?>"><i class="fa fa-hospital-o"></i> Data Poli</a>
                             <li><a href="<?= base_url('master/user') ?>"><i class="fa fa-key"></i> Manajemen User</a></li>
                         </ul>
                     </li>
