@@ -117,10 +117,20 @@ class pasien extends CI_Controller {
         }
     }
     
-    // D - DELETE (Proses Hapus)
-    public function hapus($id) {
-        $this->M_Pasien->delete($id);
-        $this->session->set_flashdata('success', 'Data Pasien berhasil dihapus!');
-        redirect('master/pasien');
-    }
+ 
+
+
+// D - DELETE (Proses Hapus)
+public function hapus($id) {
+    
+    
+    // Fungsi ini akan menjalankan DELETE berantai dari tbl_rekam_medis -> tbl_kunjungan
+    $this->M_Pasien->delete_all_transaksi($id); 
+    
+    // 2. Hapus data pasien (Sekarang aman, tidak akan ada Error 1451)
+    $this->M_Pasien->delete($id); 
+    
+    $this->session->set_flashdata('success', 'Data Pasien dan seluruh riwayat transaksi terkait berhasil dihapus!');
+    redirect('master/pasien');
+}
 }
