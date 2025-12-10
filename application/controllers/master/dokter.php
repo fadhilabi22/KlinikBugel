@@ -6,20 +6,21 @@ class Dokter extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('master/M_Dokter', 'dokter');
-        $this->load->model('master/M_Poli', 'poli');
+        // ❌ PERBAIKAN: Hapus Model Poli karena tabel sudah dihapus
+        // $this->load->model('master/M_Poli', 'poli'); 
         $this->load->library('form_validation');
         $this->load->helper('url');
     }
 
     // ========================================
-    // LIST DATA + SEARCH
+    // LIST DATA + SEARCH (Tidak Berubah)
     // ========================================
     public function index() {
         $keyword = $this->input->get('q');
 
         $data_dokter = !empty($keyword) 
-                        ? $this->dokter->search($keyword)
-                        : $this->dokter->get_all();
+                            ? $this->dokter->search($keyword)
+                            : $this->dokter->get_all();
 
         $data = [
             'title'   => 'Data Master Dokter',
@@ -34,10 +35,10 @@ class Dokter extends CI_Controller {
     // FORM INPUT (TAMBAH)
     // ========================================
     public function input() {
-
         $data = [
             'title' => 'Tambah Dokter Baru',
-            'poli'  => $this->poli->get_all()
+            // ❌ PERBAIKAN: Hapus pengiriman data Poli
+            // 'poli'  => $this->poli->get_all() 
         ];
 
         $this->template->load('template', 'master/dokter/form_input', $data);
@@ -47,7 +48,8 @@ class Dokter extends CI_Controller {
     // SIMPAN DATA
     // ========================================
     public function simpan() {
-
+        // ❌ PERBAIKAN: Hapus validasi dan pengambilan data Poli
+        /*
         $id_poli = $this->input->post('id_poli');
         $poli = $this->poli->get_by_id($id_poli);
 
@@ -55,16 +57,21 @@ class Dokter extends CI_Controller {
             $this->session->set_flashdata('error', 'Poli tidak ditemukan!');
             redirect('master/dokter/input');
         }
+        */
 
+        // 💡 Logika Baru: Ambil Tarif dan Spesialisasi dari form
         $data = [
-            'nama_dokter'  => $this->input->post('nama_dokter'),
-            'spesialisasi' => $poli->nama_poli,
-            'no_izin'      => $this->input->post('no_izin'),
-            'tarif'        => $poli->biaya_pendaftaran,
-            'id_poli'      => $id_poli
+            'nama_dokter'   => $this->input->post('nama_dokter'),
+            // ✅ Ubah spesialisasi menjadi input manual atau kosongi jika tidak ada kolomnya di DB
+            'spesialisasi'  => NULL, // Dikosongi atau diisi dari input form jika ada
+            'no_izin'       => $this->input->post('no_izin'),
+            // ✅ Ambil tarif dari input form
+            'tarif'         => $this->input->post('tarif'), 
+            // ❌ Hapus: 'id_poli' => $id_poli
         ];
 
         $this->dokter->insert($data);
+        $this->session->set_flashdata('success', 'Data dokter berhasil disimpan!');
         redirect('master/dokter');
     }
 
@@ -83,7 +90,8 @@ class Dokter extends CI_Controller {
         $data = [
             'title'  => 'Edit Dokter',
             'dokter' => $data_dokter,
-            'poli'   => $this->poli->get_all()
+            // ❌ PERBAIKAN: Hapus pengiriman data Poli
+            // 'poli'   => $this->poli->get_all() 
         ];
 
         $this->template->load('template', 'master/dokter/form_edit', $data);
@@ -95,21 +103,26 @@ class Dokter extends CI_Controller {
     public function update() {
 
         $id = $this->input->post('id_dokter');
+        
+        // ❌ PERBAIKAN: Hapus logika validasi dan pengambilan data Poli
+        /*
         $id_poli = $this->input->post('id_poli');
-
         $poli = $this->poli->get_by_id($id_poli);
 
         if (!$poli) {
             $this->session->set_flashdata('error', 'Poli tidak valid.');
             redirect('master/dokter/edit/'.$id);
         }
+        */
 
+        // 💡 Logika Baru: Ambil Tarif dan Spesialisasi dari form
         $data_update = [
-            'nama_dokter'  => $this->input->post('nama_dokter'),
-            'spesialisasi' => $poli->nama_poli,
-            'no_izin'      => $this->input->post('no_izin'),
-            'tarif'        => $poli->biaya_pendaftaran,
-            'id_poli'      => $id_poli
+            'nama_dokter'   => $this->input->post('nama_dokter'),
+            'spesialisasi'  => NULL, // Dikosongi
+            'no_izin'       => $this->input->post('no_izin'),
+            // ✅ Ambil tarif dari input form
+            'tarif'         => $this->input->post('tarif'), 
+            // ❌ Hapus: 'id_poli' => $id_poli
         ];
 
         $this->dokter->update($id, $data_update);
@@ -119,7 +132,7 @@ class Dokter extends CI_Controller {
     }
 
     // ========================================
-    // DELETE DATA
+    // DELETE DATA (Tidak Berubah)
     // ========================================
     public function hapus($id) {
         $this->dokter->delete($id);

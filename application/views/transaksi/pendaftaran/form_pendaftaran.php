@@ -31,6 +31,8 @@
                     <h4 style="color:#0A3D62; margin-top:30px;">Tujuan Kunjungan</h4>
                     <hr>
                     
+                    <?php 
+                    /*
                     <div class="form-group">
                         <label for="id_poli"><i class="fa fa-hospital-o"></i> Poli Tujuan</label>
                         <select class="form-control" name="id_poli" id="id_poli" required>
@@ -45,6 +47,8 @@
                             ?>
                         </select>
                     </div>
+                    */
+                    ?>
                     
                     <div class="form-group">
                         <label for="id_dokter"><i class="fa fa-user-md"></i> Dokter Tujuan</label>

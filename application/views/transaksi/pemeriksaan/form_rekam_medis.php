@@ -21,7 +21,6 @@
                     <div class="row">
                         <div class="col-md-6">
                             <strong>Dokter:</strong> <?php echo $kunjungan->nama_dokter; ?><br>
-                            <strong>Poli:</strong> <?php echo $kunjungan->nama_poli; ?><br>
                             <strong>Keluhan Utama:</strong> <?php echo $rekam_medis->keluhan; ?>
                         </div>
                         <div class="col-md-6">

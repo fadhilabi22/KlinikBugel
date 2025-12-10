@@ -12,21 +12,25 @@ class M_Pendaftaran extends CI_Model {
      * @return bool
      */
     public function save_kunjungan($data) {
+        // ✅ PASTIKAN $data TIDAK MENGANDUNG KEY 'id_poli' saat dipanggil dari Controller
         return $this->db->insert($this->table, $data);
     }
 
     /**
-     * Mengambil daftar antrian untuk hari ini, dengan join ke Pasien, Dokter, dan Poli
+     * Mengambil daftar antrian untuk hari ini, dengan join ke Pasien dan Dokter.
+     * ✅ PERBAIKAN: Hapus JOIN ke tbl_poli.
      * @return array
      */
     public function get_antrian_hari_ini() {
         $today = date('Y-m-d');
         
-        $this->db->select('k.*, p.nama_pasien, d.nama_dokter, t.nama_poli'); 
+        // ✅ PERBAIKAN: Hapus t.nama_poli dari SELECT
+        $this->db->select('k.*, p.nama_pasien, d.nama_dokter'); 
         $this->db->from($this->table . ' k');
         $this->db->join('tbl_pasien p', 'p.id_pasien = k.id_pasien');
         $this->db->join('tbl_dokter d', 'd.id_dokter = k.id_dokter');
-        $this->db->join('tbl_poli t', 't.id_poli = k.id_poli'); // Join ke tabel Poli
+        // ❌ PERBAIKAN: Hapus baris JOIN ke tabel Poli
+        // $this->db->join('tbl_poli t', 't.id_poli = k.id_poli'); 
         
         // Filter berdasarkan tanggal hari ini
         $this->db->where('DATE(k.tanggal_kunjungan)', $today); 
@@ -49,8 +53,7 @@ class M_Pendaftaran extends CI_Model {
     }
     
     /**
-     * Mengambil semua data Pasien (Asumsi, jika tidak ada Model M_Pasien)
-     * CATATAN: Fungsi ini bisa dihapus jika Anda sudah memiliki M_Pasien
+     * Mengambil semua data Pasien 
      */
      public function get_all_pasien() {
         return $this->db->get('tbl_pasien')->result();

@@ -8,11 +8,9 @@ class Dashboard extends CI_Controller {
     {
         parent::__construct();
         
-        // Cek Session/Login (jika sudah ada fungsi chek_session)
         // chek_session(); 
         
         // Muat Model yang sudah Anda buat
-        // Penting: Gunakan nama file/class model yang sesuai
         $this->load->model('m_dashboard'); 
     }
 

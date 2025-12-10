@@ -52,7 +52,6 @@
                             <li><a href="<?= base_url('master/pasien') ?>"><i class="fa fa-users"></i> Data Pasien</a></li>
                             <li><a href="<?= base_url('master/dokter') ?>"><i class="fa fa-user-md"></i> Data Dokter</a></li>
                             <li><a href="<?= base_url('master/obat') ?>"><i class="fa fa-medkit"></i> Data Obat/Stok</a></li>
-                            <li><a href="<?= base_url('master/poli') ?>"><i class="fa fa-hospital-o"></i> Data Poli</a>
                             <li><a href="<?= base_url('master/user') ?>"><i class="fa fa-key"></i> Manajemen User</a></li>
                         </ul>
                     </li>
@@ -202,34 +201,41 @@ jQuery(document).on('click', '#btnTambahTindakan', function() {
     var id_tindakan = jQuery('#id_tindakan_select').val(); 
     var selected_option = jQuery('#id_tindakan_select option:selected');
     
-    // Ambil nama tindakan saja (misalnya: "Suntik Vitamin (Rp 50.000)" -> "Suntik Vitamin")
     var nama_tindakan = selected_option.text().split(' (Rp ')[0];
     
-    // Ambil biaya dari data-biaya yang dikirim dari PHP
     var biaya = selected_option.data('biaya'); 
-    var catatan = jQuery('#catatan_tindakan').val();
+    var catatan = jQuery('#catatan_tindakan').val(); // Ambil catatan
 
     // 1. Validasi
     if (!id_tindakan || !biaya) {
         alert('Mohon pilih Tindakan Medis.'); return;
     }
 
-    // Format biaya untuk tampilan (Rp 50.000)
     var biaya_formatted = new Intl.NumberFormat('id-ID').format(biaya);
-    var catatan_display = catatan ? ' (' + catatan + ')' : ''; // Tampilkan catatan jika ada
+    var catatan_display = catatan ? ' (' + catatan + ')' : ''; 
 
     // 2. Buat Baris Baru (Row)
     var newRow = '<tr>' +
-                    '<td><input type="hidden" name="id_tindakan[]" value="' + id_tindakan + '">' + nama_tindakan + '<small class="text-muted">' + catatan_display + '</small></td>' +
-                    // Biaya disimpan di hidden input dalam format angka murni (tanpa Rp) untuk Controller
+                    // Input ID Tindakan
+                    '<td><input type="hidden" name="id_tindakan[]" value="' + id_tindakan + '">' + 
+                    
+                    // ✅ FIX 1: Tambahkan input hidden untuk JUMLAH (nilai default 1)
+                    '<input type="hidden" name="jumlah[]" value="1">' + 
+
+                    // ✅ FIX 2: Tambahkan input hidden untuk CATATAN (Jika Anda mau menyimpannya di DB)
+                    '<input type="hidden" name="catatan_tindakan[]" value="' + catatan + '">' + 
+                    
+                    nama_tindakan + '<small class="text-muted">' + catatan_display + '</small></td>' +
+                    
+                    // Input Biaya
                     '<td><input type="hidden" name="biaya_tindakan[]" value="' + biaya + '">Rp ' + biaya_formatted + '</td>' +
                     '<td><button type="button" class="btn btn-xs btn-danger btn-hapus-tindakan"><i class="fa fa-times"></i> Hapus</button></td>' +
                  '</tr>';
 
-    // 3. Update Tabel di Form Utama (#tindakan-list adalah ID tabel di form_rekam_medis.php)
+    // 3. Update Tabel di Form Utama
     if (jQuery('#tindakan-list tbody tr td[colspan="3"]').length) { jQuery('#tindakan-list tbody').empty(); }
     jQuery('#tindakan-list tbody').append(newRow);
-    bindHapusTindakanEvent(); // Bind fungsi hapus pada baris baru
+    bindHapusTindakanEvent(); 
 
     // 4. Reset dan Tutup Modal
     jQuery('#form-tambah-tindakan')[0].reset(); 
