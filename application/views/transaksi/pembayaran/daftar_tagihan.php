@@ -13,7 +13,6 @@
                                 <th>No</th>
                                 <th>ID Kunjungan</th>
                                 <th>Nama Pasien</th>
-                                <th>Poli</th>
                                 <th>Status</th>
                                 <th>Aksi</th>
                             </tr>
@@ -21,7 +20,6 @@
                         <tbody>
                             <?php 
                             $no = 1;
-                            // Variabel $list_tagihan dikirim dari Controller Pembayaran::index()
                             if(isset($list_tagihan) && is_array($list_tagihan)):
                                 foreach($list_tagihan as $tagihan):
                             ?>
@@ -29,7 +27,6 @@
                                 <td><?php echo $no++; ?></td>
                                 <td><?php echo $tagihan->id_kunjungan; ?></td>
                                 <td><?php echo $tagihan->nama_pasien; ?></td>
-                                <td><?php echo $tagihan->nama_poli; ?></td>
                                 <td><span class="label label-warning"><?php echo $tagihan->status_kunjungan; ?></span></td>
                                 <td class="text-center">
                                     <a href="<?php echo site_url('transaksi/pembayaran/form_tagihan/'.$tagihan->id_kunjungan); ?>" 

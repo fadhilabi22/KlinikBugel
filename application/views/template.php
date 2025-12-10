@@ -68,10 +68,16 @@
                     <li>
                         <a href="#"><i class="fa fa-file-text-o"></i> Laporan & Export <span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
-                            <li><a href="<?= base_url('laporan/harian') ?>">Laporan Harian/Bulanan</a></li>
-                            <li><a href="<?= base_url('laporan/excel') ?>">Export Excel</a></li>
-                            <li><a href="<?= base_url('laporan/pdf') ?>" target="_blank">Export PDF</a></li>
-                            <li><a href="<?= base_url('transaksi/pembayaran/struk_cetak') ?>"><i class="fa fa-print"></i> Cetak Ulang Struk</a></li>
+                            <li>
+                                <a href="<?php echo site_url('transaksi/pembayaran/laporan_pendapatan'); ?>">
+                                    <i class="fa fa-calendar"></i> Laporan Harian/Bulanan
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?php echo site_url('transaksi/pembayaran/daftar_struk_selesai'); ?>">
+                                    <i class="fa fa-print"></i> Cetak Ulang Struk
+                                </a>
+                            </li>
                         </ul>
                     </li>
 

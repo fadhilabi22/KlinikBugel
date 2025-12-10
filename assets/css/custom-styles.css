@@ -547,4 +547,18 @@ table.dataTable tbody tr:nth-child(even):hover {
 @media(max-width:360px){
     .main{width:94%}
     .inset { padding: 1.8em 1.2em; }
+/* Styling dasar untuk cetak struk */
+    @media print {
+        body { font-size: 10pt; font-family: 'Consolas', monospace; }
+        .struk-container { width: 300px; margin: 0 auto; padding: 10px; border: 1px dashed #333; }
+        .btn-print { display: none; } /* Sembunyikan tombol cetak saat mencetak */
+        .page-header, .panel-heading { display: none; }
+        .panel-body { padding: 5px; }
+        .table > tbody > tr > td, .table > thead > tr > th { padding: 3px; border-top: none; font-size: 9pt; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .header-info { border-bottom: 1px solid #000; padding-bottom: 5px; margin-bottom: 5px; }
+    }
+    .struk-container { max-width: 600px; margin: 20px auto; padding: 20px; }
+
 }

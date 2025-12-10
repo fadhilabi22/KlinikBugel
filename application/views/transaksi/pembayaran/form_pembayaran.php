@@ -15,7 +15,6 @@ if (!isset($tagihan) || !isset($total_biaya)) {
             
             <?php echo form_open('transaksi/pembayaran/simpan_pembayaran'); ?>
             <input type="hidden" name="id_kunjungan" value="<?php echo $tagihan->id_kunjungan; ?>">
-            <input type="hidden" name="id_rekam_medis" value="<?php echo $tagihan->id_rm; ?>">
             <input type="hidden" name="total_tagihan" id="total_tagihan_hidden" value="<?php echo $total_biaya; ?>">
             
             <div class="panel-body">
