@@ -8,6 +8,15 @@
                 </button>
             </div>
         <?php endif; ?>
+        <?php if ($this->session->flashdata('error')): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <?php echo $this->session->flashdata('error'); ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <?php endif; ?>
+
         
    <form method="GET" action="<?php echo site_url('master/pasien'); ?>" class="form-inline mb-3">
         <input type="text" name="keyword" class="form-control mr-2" 

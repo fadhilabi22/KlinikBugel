@@ -5,35 +5,34 @@ class pasien extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
-        // Load model pasien dan library form
         $this->load->model('master/m_pasien', 'M_Pasien'); 
         $this->load->library('form_validation');
         $this->load->helper('url');
     }
 
-    // R - READ (Menampilkan Tabel Pasien)
+    // =========================
+    // LIST PASIEN
+    // =========================
     public function index() {
 
-    // Ambil kata kunci pencarian dari GET
-    $keyword = $this->input->get('keyword');
+        $keyword = $this->input->get('keyword');
 
-    if ($keyword) {
-        // Jika ada keyword → jalankan pencarian
-        $data['pasien'] = $this->M_Pasien->search($keyword);
-    } else {
-        // Jika tidak ada keyword → tampilkan semua data
-        $data['pasien'] = $this->M_Pasien->get_all();
+        if ($keyword) {
+            $data['pasien'] = $this->M_Pasien->search($keyword);
+        } else {
+            $data['pasien'] = $this->M_Pasien->get_all();
+        }
+
+        $data['title']     = 'Data Master Pasien';
+        $data['keyword']   = $keyword;
+        $data['contents']  = 'master/pasien/lihat_data';
+
+        $this->template->load('template', $data['contents'], $data);
     }
 
-    $data['title']     = 'Data Master Pasien';
-    $data['keyword']   = $keyword;
-    $data['contents']  = 'master/pasien/lihat_data';
-
-    $this->template->load('template', $data['contents'], $data);
-}
-
-
-    // C - CREATE (Menampilkan Form Input)
+    // =========================
+    // FORM INPUT
+    // =========================
     public function input() {
         $data = [
             'title'     => 'Tambah Pasien Baru',
@@ -42,33 +41,59 @@ class pasien extends CI_Controller {
         $this->template->load('template', $data['contents'], $data);
     }
 
-    // C - CREATE (Proses Simpan Data)
-    public function simpan() {
-        // 1. Definisikan aturan validasi
-        $this->form_validation->set_rules('nama_pasien', 'Nama Pasien', 'required');
-        $this->form_validation->set_rules('tgl_lahir', 'Tanggal Lahir', 'required');
-        $this->form_validation->set_rules('alamat', 'Alamat', 'required');
-        $this->form_validation->set_rules('no_telp', 'Nomor Telepon', 'required|numeric');
-        
-        if ($this->form_validation->run() == FALSE) {
-            $this->input(); // Kembali ke form jika gagal
-        } else {
-            // 2. Kumpulkan data sesuai kolom DB (tbl_pasien)
-            $data = [
-                'nama_pasien' => $this->input->post('nama_pasien', TRUE),
-                'tgl_lahir'   => $this->input->post('tgl_lahir', TRUE),
-                'alamat'      => $this->input->post('alamat', TRUE),
-                'no_telp'     => $this->input->post('no_telp', TRUE),
-                'tgl_dibuat'  => date('Y-m-d H:i:s') // Isi otomatis tanggal dibuat
-            ];
+    // =========================
+    // SIMPAN DATA BARU
+    // + VALIDASI DUPLIKASI
+    // =========================
+    public function simpan()
+{
+    // RULE VALIDASI
+    $this->form_validation->set_rules('nama_pasien', 'Nama Pasien', 'required');
+    $this->form_validation->set_rules('tgl_lahir', 'Tanggal Lahir', 'required');
+    $this->form_validation->set_rules('alamat', 'Alamat', 'required');
+    $this->form_validation->set_rules('no_telp', 'Nomor Telepon', 'required');
 
-            $this->M_Pasien->save($data);
-            $this->session->set_flashdata('success', 'Data Pasien berhasil ditambahkan!');
-            redirect('master/pasien');
-        }
+    if ($this->form_validation->run() == FALSE) {
+        $this->input(); // kembali ke form input
+        return;
     }
-    
-    // U - UPDATE (Form Edit)
+
+    // AMBIL DATA
+    $nama = $this->input->post('nama_pasien', TRUE);
+    $tgl  = $this->input->post('tgl_lahir', TRUE);
+    $telp = $this->input->post('no_telp', TRUE);
+
+    // CEK DUPLIKAT
+    if ($this->M_Pasien->is_pasien_exist($nama, $tgl, $telp)) {
+        $this->session->set_flashdata('error', 
+            '❌ Data pasien dengan nama <b>'.$nama.'</b> sudah terdaftar!'
+        );
+        redirect('master/pasien/input');
+        return;
+    }
+
+    // DATA SIMPAN
+    $data = [
+        'nama_pasien' => $nama,
+        'tgl_lahir'   => $tgl,
+        'alamat'      => $this->input->post('alamat', TRUE),
+        'no_telp'     => $telp,
+        'tgl_dibuat'  => date('Y-m-d H:i:s')
+    ];
+
+    // SIMPAN
+    $this->M_Pasien->save($data);
+
+    $this->session->set_flashdata('success', 'Data Pasien berhasil ditambahkan!');
+    redirect('master/pasien');
+}
+
+
+
+
+    // =========================
+    // FORM EDIT
+    // =========================
     public function edit($id) {
         $pasien_data = $this->M_Pasien->get_by_id($id);
 
@@ -79,58 +104,75 @@ class pasien extends CI_Controller {
 
         $data = [
             'title'     => 'Edit Data Pasien',
-            'contents'  => 'master/pasien/form_edit', // Memuat view form edit
-            'pasien'    => $pasien_data // Mengirim data pasien ke view
+            'contents'  => 'master/pasien/form_edit',
+            'pasien'    => $pasien_data
         ];
+
         $this->template->load('template', $data['contents'], $data);
     }
-    // U - UPDATE (Proses Update)
+
+    // =========================
+    // UPDATE DATA
+    // + CEK DUPLIKASI (kecuali dirinya sendiri)
+    // =========================
     public function update() {
-        // 1. Ambil ID pasien yang akan diupdate (dari hidden input di form)
+
         $id_pasien = $this->input->post('id_pasien', TRUE);
 
-        // 2. Definisikan aturan validasi
         $this->form_validation->set_rules('nama_pasien', 'Nama Pasien', 'required');
         $this->form_validation->set_rules('tgl_lahir', 'Tanggal Lahir', 'required');
         $this->form_validation->set_rules('alamat', 'Alamat', 'required');
         $this->form_validation->set_rules('no_telp', 'Nomor Telepon', 'required|numeric');
-        
-        $this->form_validation->set_message('required', '%s harus diisi.');
-        $this->form_validation->set_message('numeric', '%s harus berupa angka.');
 
         if ($this->form_validation->run() == FALSE) {
-            // Jika validasi gagal, kembalikan ke form edit dengan ID pasien
             $this->edit($id_pasien);
-        } else {
-            // 3. Kumpulkan data yang akan diupdate
-            $data = [
-                'nama_pasien' => $this->input->post('nama_pasien', TRUE),
-                'tgl_lahir'   => $this->input->post('tgl_lahir', TRUE),
-                'alamat'      => $this->input->post('alamat', TRUE),
-                'no_telp'     => $this->input->post('no_telp', TRUE)
-            ];
-
-            // 4. Panggil Model untuk update data
-            $this->M_Pasien->update($id_pasien, $data);
-            $this->session->set_flashdata('success', 'Data Pasien berhasil diupdate!');
-            redirect('master/pasien');
+            return;
         }
+
+        // Input update
+        $nama      = $this->input->post('nama_pasien', TRUE);
+        $tgl_lahir = $this->input->post('tgl_lahir', TRUE);
+        $no_telp   = $this->input->post('no_telp', TRUE);
+
+        // ============================
+        // 🔥 VALIDASI DUPLIKASI UPDATE
+        // CEK apakah ada pasien lain dgn data sama
+        // ============================
+        $this->db->where('nama_pasien', $nama);
+        $this->db->where('tgl_lahir', $tgl_lahir);
+        $this->db->where('no_telp', $no_telp);
+        $this->db->where('id_pasien !=', $id_pasien);
+
+        if ($this->db->get('tbl_pasien')->num_rows() > 0) {
+            $this->session->set_flashdata('error', '❌ Pasien dengan data tersebut sudah ada!');
+            redirect('master/pasien/edit/' . $id_pasien);
+            return;
+        }
+
+        // Update aman
+        $data = [
+            'nama_pasien' => $nama,
+            'tgl_lahir'   => $tgl_lahir,
+            'alamat'      => $this->input->post('alamat', TRUE),
+            'no_telp'     => $no_telp
+        ];
+
+        $this->M_Pasien->update($id_pasien, $data);
+        $this->session->set_flashdata('success', 'Data pasien berhasil diupdate!');
+        redirect('master/pasien');
     }
-    
- 
 
 
-// D - DELETE (Proses Hapus)
-public function hapus($id) {
-    
-    
-    // Fungsi ini akan menjalankan DELETE berantai dari tbl_rekam_medis -> tbl_kunjungan
-    $this->M_Pasien->delete_all_transaksi($id); 
-    
-    // 2. Hapus data pasien (Sekarang aman, tidak akan ada Error 1451)
-    $this->M_Pasien->delete($id); 
-    
-    $this->session->set_flashdata('success', 'Data Pasien dan seluruh riwayat transaksi terkait berhasil dihapus!');
-    redirect('master/pasien');
-}
+    // =========================
+    // DELETE
+    // =========================
+    public function hapus($id) {
+
+        $this->M_Pasien->delete_all_transaksi($id);
+        $this->M_Pasien->delete($id);
+
+        $this->session->set_flashdata('success', 'Pasien & seluruh transaksi terkait berhasil dihapus!');
+        redirect('master/pasien');
+    }
+
 }

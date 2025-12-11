@@ -61,4 +61,14 @@ class M_Pasien extends CI_Model {
         $this->db->or_like('alamat', $keyword);
         return $this->db->get($this->table)->result();
     }
+   public function is_pasien_exist($nama, $tgl_lahir, $no_telp)
+{
+    $this->db->where('nama_pasien', $nama);
+    $this->db->where('tgl_lahir', $tgl_lahir);
+    $this->db->where('no_telp', $no_telp);
+
+    return $this->db->get('tbl_pasien')->num_rows() > 0;
+}
+
+
 }
