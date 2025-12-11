@@ -67,8 +67,12 @@ class M_Pembayaran extends CI_Model {
      * Menyimpan data pembayaran ke tbl_pembayaran. (Tidak Berubah)
      */
     public function save_pembayaran($data_pembayaran) {
-        return $this->db->insert('tbl_pembayaran', $data_pembayaran);
-    }
+    // 1. Jalankan INSERT
+    $this->db->insert('tbl_pembayaran', $data_pembayaran);
+    
+    // 2. ✅ FIX: Kembalikan ID yang baru saja ter-insert
+    return $this->db->insert_id(); 
+}
     
     /**
      * Mengambil daftar pasien yang statusnya Menunggu Pembayaran. (Tidak Berubah)

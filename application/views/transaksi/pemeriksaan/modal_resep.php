@@ -27,8 +27,8 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="jumlah_obat">Jumlah yang Diresepkan</label>
-                        <input type="number" class="form-control" id="jumlah_obat" min="1" required>
+                        <label for="jumlah_obat[]">Jumlah yang Diresepkan</label>
+                        <input type="number" class="form-control" id="jumlah_obat"required>
                     </div>
 
                     <div class="form-group">

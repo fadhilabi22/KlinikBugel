@@ -7,24 +7,23 @@ class Pemeriksaan extends CI_Controller {
         parent::__construct();
         date_default_timezone_set('Asia/Jakarta');
         
-        // Memuat Model Pemeriksaan dan Model lain
+        // Memuat Model-model yang diperlukan
         $this->load->model('transaksi/m_pemeriksaan', 'M_Pemeriksaan');
-        $this->load->model('transaksi/m_pendaftaran', 'M_Pendaftaran'); // Untuk update status
+        $this->load->model('transaksi/m_pendaftaran', 'M_Pendaftaran'); 
         $this->load->model('master/m_obat', 'M_Obat'); 
         $this->load->model('transaksi/m_tindakan', 'M_Tindakan');
         
         $this->load->library('form_validation');
         $this->load->helper('url');
-        // chek_session(); // Cek login dan role dokter
+        // chek_session(); 
     }
 
     // [GET] FUNGSI 1: Tampilkan Antrian Pasien Siap Diperiksa (DOKTER VIEW)
     public function index() {
-        // Asumsi: Ambil antrian untuk semua dokter atau filter berdasarkan sesi user (jika sudah ada)
         $data = [
             'title'             => 'Daftar Pasien Siap Diperiksa',
-            'contents'          => 'transaksi/pemeriksaan/daftar_pasien_dokter', // View antrian dokter
-            'antrian_dokter'    => $this->M_Pemeriksaan->get_pasien_siap_diperiksa() // Ambil list pasien siap periksa
+            'contents'          => 'transaksi/pemeriksaan/daftar_pasien_dokter', 
+            'antrian_dokter'    => $this->M_Pemeriksaan->get_pasien_siap_diperiksa() 
         ];
         $this->template->load('template', $data['contents'], $data);
     }
@@ -40,191 +39,188 @@ class Pemeriksaan extends CI_Controller {
         }
 
         $data = [
-            'title'        => 'Input Tanda-Tanda Vital',
-            'contents'     => 'transaksi/pendaftaran/form_vital_sign', 
-            'kunjungan'    => $kunjungan, 
-            'id_kunjungan' => $id_kunjungan
+            'title'         => 'Input Tanda-Tanda Vital',
+            'contents'      => 'transaksi/pendaftaran/form_vital_sign', 
+            'kunjungan'     => $kunjungan, 
+            'id_kunjungan'  => $id_kunjungan
         ];
         $this->template->load('template', $data['contents'], $data);
     }
     
     // [POST] FUNGSI 3: Menyimpan Vital Sign (Oleh Perawat)
     public function simpan_vital_sign() {
-    $id_kunjungan = $this->input->post('id_kunjungan', TRUE);
-    
-    // ✅ FIX 1: Load data kunjungan untuk mendapatkan id_dokter
-    $kunjungan = $this->M_Pemeriksaan->get_kunjungan_by_id($id_kunjungan); 
-
-    if (!$kunjungan) {
-         $this->session->set_flashdata('error', 'Kunjungan tidak ditemukan. Transaksi dibatalkan.');
-         redirect('transaksi/pendaftaran');
-         return; // Hentikan eksekusi
-    }
-    
-    // Aturan validasi
-    $this->form_validation->set_rules('tensi', 'Tekanan Darah', 'required');
-    $this->form_validation->set_rules('suhu', 'Suhu Tubuh', 'required|numeric');
-    $this->form_validation->set_rules('keluhan', 'Keluhan Utama', 'required');
-    $this->form_validation->set_rules('bb', 'Berat Badan', 'required|numeric');
-    
-    if ($this->form_validation->run() == FALSE) {
-        // Jika validasi gagal, kembali ke form dengan data kunjungan
-        $this->input_vitalsign($id_kunjungan);
-    } else {
+        $id_kunjungan = $this->input->post('id_kunjungan', TRUE);
         
-        $data_rm = [
-            'id_kunjungan' => $id_kunjungan,
-            
-            // ✅ FIX 2: Masukkan id_dokter dari data kunjungan yang di-load
-            'id_dokter' => $kunjungan->id_dokter, 
-            
-            // ✅ KELUHAN UTAMA: Sesuai dengan kolom 'keluhan'
-            'keluhan' => $this->input->post('keluhan', TRUE),
-            
-            // ✅ FIX 3: GABUNGKAN VITAL SIGN KE 'catatan_medis'
-            'catatan_medis' => 
-                'Tensi: ' . $this->input->post('tensi', TRUE) . ' mmHg | ' .
-                'Suhu: ' . $this->input->post('suhu', TRUE) . ' °C | ' .
-                'BB: ' . $this->input->post('bb', TRUE) . ' kg',
-            
-            // ✅ FIX 4: Nama kolom tanggal yang benar
-            'tgl_pemeriksaan' => date('Y-m-d H:i:s'), 
-            
-            // Kolom 'diagnosa' dikosongkan/disiapkan
-            'diagnosa' => NULL, 
-            
-            // Jika Anda menambahkan kolom status_rm di DB, masukkan di sini. Karena sebelumnya tidak ada, kita hapus agar tidak error 1054.
-        ];
+        $kunjungan = $this->M_Pemeriksaan->get_kunjungan_by_id($id_kunjungan); 
 
-        // ✅ FIX 5: Lakukan INSERT ke DB (save_rekam_medis)
-        $id_rekam_medis = $this->M_Pemeriksaan->save_rekam_medis($data_rm); 
+        if (!$kunjungan) {
+             $this->session->set_flashdata('error', 'Kunjungan tidak ditemukan. Transaksi dibatalkan.');
+             redirect('transaksi/pendaftaran');
+             return; 
+        }
         
-        if ($id_rekam_medis) {
-            // Update status kunjungan menjadi 'Vital Sign OK'
-            $this->M_Pendaftaran->update_status($id_kunjungan, 'Vital Sign OK');
-            
-            $this->session->set_flashdata('success', 'Tanda Vital dicatat. Pasien siap diperiksa dokter!');
-            
-            // Arahkan ke daftar antrian dokter
-            redirect('transaksi/pemeriksaan'); 
-
+        // Aturan validasi
+        $this->form_validation->set_rules('tensi', 'Tekanan Darah', 'required');
+        $this->form_validation->set_rules('suhu', 'Suhu Tubuh', 'required|numeric');
+        $this->form_validation->set_rules('keluhan', 'Keluhan Utama', 'required');
+        $this->form_validation->set_rules('bb', 'Berat Badan', 'required|numeric');
+        
+        if ($this->form_validation->run() == FALSE) {
+            $this->input_vitalsign($id_kunjungan);
         } else {
-            $this->session->set_flashdata('error', 'Gagal menyimpan Tanda Vital. Cek Foreign Key atau kolom Wajib Isi (NOT NULL).');
-            redirect('transaksi/pendaftaran');
+            
+            $data_rm = [
+                'id_kunjungan' => $id_kunjungan,
+                'id_dokter' => $kunjungan->id_dokter, 
+                'keluhan' => $this->input->post('keluhan', TRUE),
+                'catatan_medis' => 
+                    'Tensi: ' . $this->input->post('tensi', TRUE) . ' mmHg | ' .
+                    'Suhu: ' . $this->input->post('suhu', TRUE) . ' °C | ' .
+                    'BB: ' . $this->input->post('bb', TRUE) . ' kg',
+                'tgl_pemeriksaan' => date('Y-m-d H:i:s'), 
+                'diagnosa' => NULL, 
+            ];
+
+            $id_rekam_medis = $this->M_Pemeriksaan->save_rekam_medis($data_rm); 
+            
+            if ($id_rekam_medis) {
+                $this->M_Pendaftaran->update_status($id_kunjungan, 'Vital Sign OK');
+                $this->session->set_flashdata('success', 'Tanda Vital dicatat. Pasien siap diperiksa dokter!');
+                redirect('transaksi/pemeriksaan'); 
+            } else {
+                $this->session->set_flashdata('error', 'Gagal menyimpan Tanda Vital. Cek Foreign Key atau kolom Wajib Isi (NOT NULL).');
+                redirect('transaksi/pendaftaran');
+            }
         }
     }
-}
     
     // [GET] FUNGSI 4: Menampilkan Form Diagnosis (Oleh Dokter)
-    // DI Controller Pemeriksaan.php::input_diagnosis($id_rekam_medis)
-
-public function input_diagnosis($id_rekam_medis) {
-    // 1. Ambil data Rekam Medis berdasarkan ID (id_rm)
-    $rekam_medis = $this->M_Pemeriksaan->get_by_id($id_rekam_medis);
-    
-    if (!$rekam_medis) {
-        $this->session->set_flashdata('error', 'Data Rekam Medis tidak ditemukan atau sudah selesai.');
-        redirect('transaksi/pemeriksaan');
-        return;
-    }
-
-    // 2. Ambil data Kunjungan terkait
-    $kunjungan = $this->M_Pemeriksaan->get_kunjungan_by_id($rekam_medis->id_kunjungan);
-    
-    if (!$kunjungan) {
-        $this->session->set_flashdata('error', 'Data Kunjungan terkait Rekam Medis tidak ditemukan.');
-        redirect('transaksi/pemeriksaan');
-        return;
-    }
-    
-    // 3. Kirim data ke View form_rekam_medis.php
-    $data = [
-        'title'         => 'Pemeriksaan & Diagnosis Final',
-        'contents'      => 'transaksi/pemeriksaan/form_rekam_medis',
-        'rekam_medis'   => $rekam_medis, 
-        'kunjungan'     => $kunjungan, 
-        'list_obat'     => $this->M_Obat->get_all(), 
+    public function input_diagnosis($id_rekam_medis) {
+        $rekam_medis = $this->M_Pemeriksaan->get_by_id($id_rekam_medis);
         
-        // ✅ FIX: Memuat dan mengirim list tindakan
-        'list_tindakan' => $this->M_Tindakan->get_all_tindakan(),
-    ];
-    
-    $this->template->load('template', $data['contents'], $data);
-}
+        if (!$rekam_medis) {
+            $this->session->set_flashdata('error', 'Data Rekam Medis tidak ditemukan atau sudah selesai.');
+            redirect('transaksi/pemeriksaan');
+            return;
+        }
+
+        $kunjungan = $this->M_Pemeriksaan->get_kunjungan_by_id($rekam_medis->id_kunjungan);
+        
+        if (!$kunjungan) {
+            $this->session->set_flashdata('error', 'Data Kunjungan terkait Rekam Medis tidak ditemukan.');
+            redirect('transaksi/pemeriksaan');
+            return;
+        }
+        
+        $data = [
+            'title'             => 'Pemeriksaan & Diagnosis Final',
+            'contents'          => 'transaksi/pemeriksaan/form_rekam_medis',
+            'rekam_medis'       => $rekam_medis, 
+            'kunjungan'         => $kunjungan, 
+            'list_obat'         => $this->M_Obat->get_all(), 
+            'list_tindakan'     => $this->M_Tindakan->get_all_tindakan(),
+        ];
+        
+        $this->template->load('template', $data['contents'], $data);
+    }
     
     // [POST] FUNGSI 5: Menyimpan Diagnosis, Tindakan, dan Resep FINAL (Oleh Dokter)
     public function simpan_diagnosis_final() {
     
-    // 1. Ambil Data Kunci (ID Rekam Medis & ID Kunjungan)
-    $id_rekam_medis = $this->input->post('id_rekam_medis', TRUE);
-    $id_kunjungan = $this->input->post('id_kunjungan', TRUE); // WAJIB DIKIRIM DARI FORM
+        // 1. Ambil Data Kunci (ID Rekam Medis & ID Kunjungan)
+        $id_rekam_medis = $this->input->post('id_rekam_medis', TRUE);
+        $id_kunjungan = $this->input->post('id_kunjungan', TRUE); 
 
-    // --- 2. Ambil Data Diagnosis & Anamnesis ---
-    $data_rm_update = [
-        'diagnosa'          => $this->input->post('diagnosa', TRUE),
-        'catatan_medis'     => $this->input->post('anamnesis', TRUE),
-        'tgl_pemeriksaan'   => date('Y-m-d H:i:s'), // Waktu pemeriksaan selesai
-        // 'status_rm'         => 'Selesai' 
-    ];
-
-    // --- 3. Proses Data Resep (Array) ---
-    $id_obat_arr        = $this->input->post('id_obat');
-    $jumlah_arr         = $this->input->post('jumlah');
-    $aturan_pakai_arr   = $this->input->post('aturan_pakai');
-
-    // DI Controller transaksi/pemeriksaan/Pemeriksaan.php::simpan_diagnosis_final()
-
-// --- 3. Proses Data Resep (Array) ---
-// ... (pengambilan data array) ...
-
-$data_resep = [];
-if (!empty($id_obat_arr)) {
-    foreach ($id_obat_arr as $key => $id_obat) {
-        $data_resep[] = [
-            // ❌ KODE LAMA: 'id_rekam_medis' => $id_rekam_medis, 
-            // ✅ FIX: Ganti ke 'id_rm' agar sesuai dengan kolom DB
-            'id_rm' => $id_rekam_medis, 
-            'id_obat' => $id_obat, 
-            'jumlah' => $jumlah_arr[$key], 
-            'aturan_pakai' => $aturan_pakai_arr[$key], 
+        // --- 2. Ambil Data Diagnosis & Anamnesis ---
+        $data_rm_update = [
+            'diagnosa'          => $this->input->post('diagnosa', TRUE),
+            'catatan_medis'     => $this->input->post('anamnesis', TRUE), 
+            'tgl_pemeriksaan'   => date('Y-m-d H:i:s'), 
         ];
-    }
-}
 
-// --- 4. Proses Data Tindakan (Array) ---
-// ... (pengambilan data array) ...
+        // --- 3. Proses Data Resep (Array) ---
+        $id_obat_arr        = $this->input->post('id_obat');
+        $jumlah_arr         = $this->input->post('jumlah');
+        $aturan_pakai_arr   = $this->input->post('aturan_pakai');
+        
+        $data_resep_obat = [];
+        
+        // ✅ FIX TOTAL: Looping berdasarkan array JUMLAH (yang terkirim penuh) dan validasi ketersediaan key
+        if (!empty($jumlah_arr) && is_array($jumlah_arr)) {
+            foreach ($jumlah_arr as $key => $jumlah) {
+                
+                // Jika $id_obat_arr atau $aturan_pakai_arr tidak lengkap, lewati.
+                if (!isset($id_obat_arr[$key]) || !isset($aturan_pakai_arr[$key])) {
+                    continue; 
+                }
+                
+                $jumlah_resep = (int)$jumlah;
 
-$data_tindakan = [];
-if (!empty($id_tindakan_arr)) {
-    foreach ($id_tindakan_arr as $key => $id_tindakan) {
-        $data_tindakan[] = [
-            'id_rm' => $id_rekam_medis, 
-            'id_tindakan' => $id_tindakan, 
-            'biaya' => $biaya_tindakan_arr[$key], 
-        ];
-    }
-}
+                $data_resep_obat[] = [
+                    'id_rm'          => $id_rekam_medis, 
+                    'id_obat'        => $id_obat_arr[$key], // Ambil ID obat berdasarkan key jumlah
+                    'jumlah'         => $jumlah_resep, // Nilai yang BENAR (14) akan digunakan!
+                    'aturan_pakai'   => $aturan_pakai_arr[$key], 
+                ];
+            } 
+        } 
 
-    // --- 5. Simpan ke Database (Perlu Transaction untuk keamanan) ---
-    
-    // a. Update Rekam Medis utama
-    $this->M_Pemeriksaan->update_rekam_medis($id_rekam_medis, $data_rm_update);
-    
-    // b. Insert batch Resep dan Tindakan
-    if (!empty($data_resep)) {
-        $this->M_Pemeriksaan->save_resep($data_resep);
+        // --- 4. Proses Data Tindakan (Array) ---
+        $id_tindakan_arr = $this->input->post('id_tindakan');
+        // Asumsi data tindakan dikirim, siapkan array untuk Model
+        $data_tindakan = [];
+        if (!empty($id_tindakan_arr)) {
+            foreach ($id_tindakan_arr as $key => $id_tindakan) {
+                $data_tindakan[] = [
+                    'id_rm'         => $id_rekam_medis, 
+                    'id_tindakan'   => $id_tindakan, 
+                    'jumlah'        => 1 // Asumsi jumlah tindakan 1
+                ];
+            }
+        }
+
+        // --- 5. Simpan ke Database (LAKUKAN TRANSACTION DI SINI!) ---
+        
+        $this->db->trans_start(); 
+        
+        // 5a. Update Rekam Medis utama
+        $this->M_Pemeriksaan->update_rekam_medis($id_rekam_medis, $data_rm_update);
+        
+        // 5b. Sisipkan Tindakan (KRUSIAL: Agar tidak terjadi Error 1452 FK)
+        if (!empty($data_tindakan)) {
+            // Asumsi Model Anda memiliki fungsi untuk menyimpan tindakan:
+            // $this->M_Pemeriksaan->save_tindakan($data_tindakan); // Jika Anda punya fungsi ini
+            
+            // Jika Anda ingin mengirim ke Kasir, gunakan flashdata:
+            $this->session->set_flashdata('data_tindakan', $data_tindakan);
+        }
+        
+        // 5c. KRUSIAL: Simpan Resep DAN KURANGI STOK
+        if (!empty($data_resep_obat)) {
+            $stok_berhasil = $this->M_Pemeriksaan->save_resep_dan_kurangi_stok($id_rekam_medis, $data_resep_obat);
+            
+            if ($stok_berhasil === FALSE) {
+                $this->db->trans_rollback(); 
+                $this->session->set_flashdata('error', 'Gagal menyimpan resep atau stok obat. Transaksi dibatalkan.');
+                redirect('transaksi/pemeriksaan');
+                return;
+            }
+        }
+        
+        // 5d. Update status kunjungan
+        if ($id_kunjungan) {
+            $this->M_Pendaftaran->update_status($id_kunjungan, 'Menunggu Pembayaran');
+        }
+        
+        $this->db->trans_complete(); // Akhiri Transaction
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->session->set_flashdata('error', 'Kesalahan Database saat memfinalisasi pemeriksaan. Cek log error.');
+        } else {
+            // --- 6. Feedback dan Redirect ---
+            $this->session->set_flashdata('success', 'Pemeriksaan selesai. Resep dicatat dan stok obat disesuaikan. Pasien diarahkan ke Kasir.');
+        }
+
+        redirect('transaksi/pemeriksaan');
     }
-    if (!empty($data_tindakan)) {
-        $this->M_Pemeriksaan->save_detail_tindakan($data_tindakan);
-    }
-    
-    // c. Update status kunjungan
-    if ($id_kunjungan) {
-        $this->M_Pendaftaran->update_status($id_kunjungan, 'Menunggu Pembayaran');
-    }
-    
-    // --- 6. Feedback dan Redirect ---
-    $this->session->set_flashdata('success', 'Pemeriksaan selesai. Pasien diarahkan ke Kasir.');
-    redirect('transaksi/pemeriksaan'); // Arahkan kembali ke antrian pemeriksaan (bukan pendaftaran)
-}
 }

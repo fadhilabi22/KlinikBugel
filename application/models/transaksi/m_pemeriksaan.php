@@ -11,6 +11,13 @@ class M_Pemeriksaan extends CI_Model {
     private $tbl_resep = 'tbl_resep_obat';
     private $tbl_detail_tindakan = 'tbl_detail_tindakan'; 
 
+    // ✅ FIX 1: TAMBAHKAN CONSTRUCTOR UNTUK MEMUAT MODEL LAIN
+    public function __construct() {
+        parent::__construct();
+        // Muat model obat agar bisa diakses oleh $this->M_Obat di Model ini
+        $this->load->model('master/m_obat', 'M_Obat'); 
+    }
+    
     /**
      * Menyimpan data Rekam Medis (Vital Sign/Diagnosis Awal)
      */
@@ -38,20 +45,40 @@ class M_Pemeriksaan extends CI_Model {
         }
         return FALSE;
     }
+    
+    // ✅ FIX 2: Sempurnakan logic error handling
+    public function save_resep_dan_kurangi_stok($id_rm, $data_resep_array) {
+        
+        // Cek: M_Obat sudah pasti ada karena dimuat di __construct()
+        
+        // 1. Looping untuk setiap obat dalam resep
+        foreach ($data_resep_array as $detail) {
+            
+            // 2. Simpan Detail Resep
+            $this->db->insert($this->tbl_resep, $detail);
+
+            // 3. ✅ BAGIAN KRUSIAL: Panggil fungsi pengurangan stok
+            $kurangi_stok_sukses = $this->M_Obat->kurangi_stok($detail['id_obat'], $detail['jumlah']);
+            
+            if ($kurangi_stok_sukses === FALSE) {
+                // Jika update stok gagal (Error database)
+                // Kita kembalikan FALSE agar Controller memicu rollback
+                return FALSE; 
+            } 
+        }
+        
+        return TRUE; // Jika looping berhasil
+    }
 
     /**
      * Mengambil data kunjungan berdasarkan ID untuk form pemeriksaan
      * Join ke Pasien, Dokter.
-     * ✅ PERBAIKAN: Hapus JOIN ke tbl_poli.
      */
     public function get_kunjungan_by_id($id_kunjungan) {
-        // ✅ PERBAIKAN: Hapus t.nama_poli dari SELECT
         $this->db->select('k.*, p.nama_pasien, p.no_telp, p.alamat, d.nama_dokter');
         $this->db->from('tbl_kunjungan k');
         $this->db->join('tbl_pasien p', 'p.id_pasien = k.id_pasien');
         $this->db->join('tbl_dokter d', 'd.id_dokter = k.id_dokter');
-        // ❌ PERBAIKAN: Hapus JOIN ke tbl_poli
-        // $this->db->join('tbl_poli t', 't.id_poli = k.id_poli');
         $this->db->where('k.id_kunjungan', $id_kunjungan);
         return $this->db->get()->row();
     }
@@ -66,17 +93,12 @@ class M_Pemeriksaan extends CI_Model {
     
     /**
      * Mengambil daftar pasien yang sudah selesai Vital Sign dan siap diperiksa dokter
-     * ✅ PERBAIKAN: Hapus JOIN ke tbl_poli.
      */
     public function get_pasien_siap_diperiksa($id_dokter = null) {
-        // ✅ PERBAIKAN: Hapus t.nama_poli dari SELECT
         $this->db->select('rm.id_rm, k.id_kunjungan, k.tanggal_kunjungan as tgl_vitalsign, rm.keluhan, p.nama_pasien, k.status_kunjungan');
         $this->db->from('tbl_rekam_medis rm');
         $this->db->join('tbl_kunjungan k', 'k.id_kunjungan = rm.id_kunjungan');
         $this->db->join('tbl_pasien p', 'p.id_pasien = k.id_pasien');
-        // ❌ PERBAIKAN: Hapus JOIN ke tbl_poli
-        // $this->db->join('tbl_poli t', 't.id_poli = k.id_poli');
-
         $this->db->where('k.status_kunjungan', 'Vital Sign OK');
         
         if ($id_dokter) {

@@ -6,8 +6,12 @@
             </div>
             <div class="panel-body">
                 <?php echo validation_errors('<div class="alert alert-danger">', '</div>'); ?>
+                
+                <?php if ($this->session->flashdata('error')): ?>
+                    <div class="alert alert-danger"><?php echo $this->session->flashdata('error'); ?></div>
+                <?php endif; ?>
 
-                <?php echo form_open('master/obat/simpan'); ?>
+                <?php echo form_open_multipart('master/obat/simpan'); ?>
 
                     <div class="form-group">
                         <label for="nama_obat"><i class="fa fa-info-circle"></i> Nama Obat</label>
@@ -51,6 +55,15 @@
                                value="<?php echo set_value('stok'); ?>"
                                placeholder="Jumlah stok awal"
                                required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="foto_obat"><i class="fa fa-camera"></i> Foto Obat (Opsional)</label>
+                        <input type="file"
+                               class="form-control"
+                               name="foto_obat"
+                               id="foto_obat">
+                        <p class="help-block text-muted">Maksimal 2MB. Format: JPG, PNG, GIF.</p>
                     </div>
 
                     <div class="mt-4">

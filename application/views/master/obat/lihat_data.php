@@ -16,6 +16,15 @@
                 </button>
             </div>
         <?php endif; ?>
+        
+        <?php if ($this->session->flashdata('error_upload')): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Gagal Update Foto:</strong> <?php echo $this->session->flashdata('error_upload'); ?>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <?php endif; ?>
 
         <form method="GET" action="<?php echo site_url('master/obat'); ?>" class="form-inline mb-3">
 
@@ -51,7 +60,8 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Nama Obat / Satuan</th>
+                                <th>Foto</th> <th>Nama Obat</th> 
+                                <th>Satuan</th>
                                 <th>Harga Jual (Rp)</th>
                                 <th>Stok Saat Ini</th>
                                 <th>Status Stok</th>
@@ -69,12 +79,24 @@
                             ?>
                             <tr class="odd gradeX">
                                 <td><?php echo $no++; ?></td>
+                                
+                                <td>
+                                    <?php if ($row->foto_obat): ?>
+                                        <img src="<?= base_url('assets/img/obat/' . $row->foto_obat); ?>"
+                                            alt="<?= $row->nama_obat; ?>"
+                                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                    <?php else: ?>
+                                        <i class="fa fa-picture-o fa-2x text-muted" title="Tidak ada foto"></i>
+                                    <?php endif; ?>
+                                </td>
 
-                                <!-- FIXED: gunakan nama_obat dan satuan -->
+                                
                                 <td>
                                     <i class="fa fa-medkit"></i> 
-                                    <?php echo $row->nama_obat . ' (' . $row->satuan . ')'; ?>
+                                    <?php echo $row->nama_obat; ?>
                                 </td>
+
+                                <td><?php echo $row->satuan; ?></td>
 
                                 <td>Rp <?php echo number_format($row->harga_jual, 0, ',', '.'); ?></td>
                                 <td><?php echo number_format($row->stok, 0, ',', '.'); ?></td>
@@ -104,7 +126,7 @@
                             else:
                             ?>
                             <tr>
-                                <td colspan="6" class="text-center">Belum ada data obat atau stok ditemukan.</td>
+                                <td colspan="8" class="text-center">Belum ada data obat atau stok ditemukan.</td>
                             </tr>
                             <?php endif; ?>
                         </tbody>

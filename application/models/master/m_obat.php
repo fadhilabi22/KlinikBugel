@@ -42,4 +42,10 @@ class M_Obat extends CI_Model {
         $this->db->or_like('harga_jual', $keyword); // opsional
         return $this->db->get($this->table)->result();
     }
+    public function kurangi_stok($id_obat, $jumlah) {
+        // Menggunakan operator SET dengan flag FALSE agar MySQL menjalankan 'stok = stok - jumlah'
+        $this->db->set('stok', 'stok - ' . (int)$jumlah, FALSE); 
+        $this->db->where($this->pk, $id_obat);
+        return $this->db->update($this->table);
+    }
 }

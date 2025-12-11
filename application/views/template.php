@@ -120,134 +120,160 @@
     <script src="<?= base_url('assets/js/morris/raphael-2.1.0.min.js') ?>"></script>
     <script src="<?= base_url('assets/js/morris/morris.js') ?>"></script>
 
-    <script>
-// Menggunakan jQuery() untuk memastikan kompatibilitas
+```javascript
+<script>
 jQuery(document).ready(function() {
 
-    // --- FUNGSI PENDUKUNG: Hapus Baris ---
-    function bindHapusResepEvent() {
-        // Menggunakan delegasi event pada elemen induk yang statis
-        jQuery('#resep-list').off('click', '.btn-hapus-resep').on('click', '.btn-hapus-resep', function() {
+    /* ======================================================
+       1. EVENT HAPUS RESEP
+    ====================================================== */
+    function bindHapusResep() {
+        jQuery('#resep-list').off('click', '.btn-hapus-resep')
+        .on('click', '.btn-hapus-resep', function() {
             jQuery(this).closest('tr').remove();
+
             if (jQuery('#resep-list tbody tr').length === 0) {
-                jQuery('#resep-list tbody').append('<tr><td colspan="4" class="text-center">Belum ada obat yang diresepkan.</td></tr>');
+                jQuery('#resep-list tbody').html(
+                    '<tr><td colspan="4" class="text-center">Belum ada obat yang diresepkan.</td></tr>'
+                );
             }
         });
     }
+    bindHapusResep();
 
-    // --- LOGIKA UTAMA: Menangani Tombol "Tambah ke Resep" ---
-    function setupResepButton() {
-        // 🛑 Pastikan tombol lama dimatikan sebelum memasang yang baru
-        jQuery(document).off('click', '#btnTambahResep'); 
-        
-        // ✅ PASANG EVENT BARU
-        jQuery(document).on('click', '#btnTambahResep', function() {
-            
-            // alert("Tombol Ditekan!"); // <--- COBA TAMBAHKAN INI UNTUK DEBUGGING!
-            
-            var id_obat = jQuery('#id_obat_select').val();
-            var selected_option = jQuery('#id_obat_select option:selected');
-            var nama_obat_full = selected_option.text();
-            var jumlah = jQuery('#jumlah_obat').val();
-            var aturan_pakai = jQuery('#aturan_pakai').val();
 
-            // 1. Validasi
-            if (!id_obat || !jumlah || !aturan_pakai || parseInt(jumlah) <= 0) {
-                alert('Mohon lengkapi data Resep dengan benar.'); return;
-            }
+    /* ======================================================
+       2. TAMBAH RESEP (FIX TOTALLL)
+    ====================================================== */
+    jQuery(document).on('click', '#btnTambahResep', function() {
 
-            var nama_obat = nama_obat_full.split(' - Stok:')[0]; 
-            var newRow = '<tr>' +
-                            '<td><input type="hidden" name="id_obat[]" value="' + id_obat + '">' + nama_obat + '</td>' +
-                            '<td><input type="hidden" name="jumlah[]" value="' + jumlah + '">' + jumlah + '</td>' +
-                            '<td><input type="hidden" name="aturan_pakai[]" value="' + aturan_pakai + '">' + aturan_pakai + '</td>' +
-                            '<td><button type="button" class="btn btn-xs btn-danger btn-hapus-resep"><i class="fa fa-times"></i> Hapus</button></td>' +
-                         '</tr>';
+        let id_obat = jQuery('#id_obat_select').val();
+        let opt = jQuery('#id_obat_select option:selected');
+        let nama_full = opt.text();
 
-            // 2. Update Tabel di Form Utama
-            if (jQuery('#resep-list tbody tr td[colspan="4"]').length) { jQuery('#resep-list tbody').empty(); }
-            jQuery('#resep-list tbody').append(newRow);
-            bindHapusResepEvent(); // Bind fungsi hapus pada baris baru
+        let jumlah = parseInt(jQuery('#jumlah_obat').val());
+        let aturan = jQuery('#aturan_pakai').val();
 
-            // 3. Reset dan Tutup Modal
-            jQuery('#form-tambah-resep')[0].reset();
-            // Karena class select2 dihapus, ini mungkin tidak berfungsi dengan baik
-            jQuery('#id_obat_select').val('').trigger('change'); 
-            jQuery('#modalResep').modal('hide');
-        });
-    }
-
-    // WAJIB: JALANKAN SETELAH DOKUMEN SIAP
-    // Jika masih gagal, coba bungkus setupResepButton() di setTimeout(..., 500)
-    setupResepButton(); 
-
-    // Jika Anda ingin Select2 berfungsi untuk element lain di modal:
-    jQuery('#modalResep').on('shown.bs.modal', function () {
-        // Jika ada elemen SELECT yang ingin diinisialisasi Select2
-        // jQuery('.select2-lain').select2({ dropdownParent: jQuery('#modalResep') });
-        setupResepButton(); // Pastikan event diikat ulang jika modal dibuka
-    });
-    // DI template.php (di dalam jQuery(document).ready(function() { ... });)
-
-// --- FUNGSI PENDUKUNG: Hapus Baris Tindakan ---
-function bindHapusTindakanEvent() {
-    // Delegated event untuk tombol hapus di tabel utama
-    jQuery('#tindakan-list').off('click', '.btn-hapus-tindakan').on('click', '.btn-hapus-tindakan', function() {
-        jQuery(this).closest('tr').remove();
-        if (jQuery('#tindakan-list tbody tr').length === 0) {
-            jQuery('#tindakan-list tbody').append('<tr><td colspan="3" class="text-center">Belum ada tindakan yang ditambahkan.</td></tr>');
+        // Validasi
+        if (!id_obat || isNaN(jumlah) || jumlah <= 0 || !aturan) {
+            alert('Mohon isi data resep dengan lengkap.');
+            return;
         }
+
+        // Ambil nama obat saja (tanpa stok)
+        let nama_obat = nama_full.split(' - Stok:')[0];
+
+        let row = `
+            <tr>
+                <td>
+                    <input type="hidden" name="id_obat[]" value="${id_obat}">
+                    ${nama_obat}
+                </td>
+                <td>
+                    <input type="hidden" name="jumlah[]" value="${jumlah}">
+                    ${jumlah}
+                </td>
+                <td>
+                    <input type="hidden" name="aturan_pakai[]" value="${aturan}">
+                    ${aturan}
+                </td>
+                <td>
+                    <button type="button" class="btn btn-xs btn-danger btn-hapus-resep">
+                        <i class="fa fa-times"></i> Hapus
+                    </button>
+                </td>
+            </tr>
+        `;
+
+        // Hapus row "Belum ada"
+        if (jQuery('#resep-list tbody tr td[colspan="4"]').length) {
+            jQuery('#resep-list tbody').empty();
+        }
+
+        jQuery('#resep-list tbody').append(row);
+
+        // Reset form modal
+        jQuery('#form-tambah-resep')[0].reset();
+        jQuery('#id_obat_select').val('').trigger('change');
+        jQuery('#modalResep').modal('hide');
+
+        bindHapusResep();
     });
-}
 
-// --- LOGIKA UTAMA: Menangani Tombol "Tambah ke Tindakan" ---
-// Menggunakan Delegated Event pada document sebagai fallback terkuat
-jQuery(document).on('click', '#btnTambahTindakan', function() {
-    
-    var id_tindakan = jQuery('#id_tindakan_select').val(); 
-    var selected_option = jQuery('#id_tindakan_select option:selected');
-    
-    var nama_tindakan = selected_option.text().split(' (Rp ')[0];
-    
-    var biaya = selected_option.data('biaya'); 
-    var catatan = jQuery('#catatan_tindakan').val(); // Ambil catatan
 
-    // 1. Validasi
-    if (!id_tindakan || !biaya) {
-        alert('Mohon pilih Tindakan Medis.'); return;
+
+    /* ======================================================
+       3. EVENT HAPUS TINDAKAN
+    ====================================================== */
+    function bindHapusTindakan() {
+        jQuery('#tindakan-list').off('click', '.btn-hapus-tindakan')
+        .on('click', '.btn-hapus-tindakan', function() {
+            jQuery(this).closest('tr').remove();
+
+            if (jQuery('#tindakan-list tbody tr').length === 0) {
+                jQuery('#tindakan-list tbody').html(
+                    '<tr><td colspan="3" class="text-center">Belum ada tindakan yang ditambahkan.</td></tr>'
+                );
+            }
+        });
     }
+    bindHapusTindakan();
 
-    var biaya_formatted = new Intl.NumberFormat('id-ID').format(biaya);
-    var catatan_display = catatan ? ' (' + catatan + ')' : ''; 
 
-    // 2. Buat Baris Baru (Row)
-    var newRow = '<tr>' +
-                    // Input ID Tindakan
-                    '<td><input type="hidden" name="id_tindakan[]" value="' + id_tindakan + '">' + 
-                    
-                    // ✅ FIX 1: Tambahkan input hidden untuk JUMLAH (nilai default 1)
-                    '<input type="hidden" name="jumlah[]" value="1">' + 
+    /* ======================================================
+       4. TAMBAH TINDAKAN
+    ====================================================== */
+    jQuery(document).on('click', '#btnTambahTindakan', function() {
 
-                    // ✅ FIX 2: Tambahkan input hidden untuk CATATAN (Jika Anda mau menyimpannya di DB)
-                    '<input type="hidden" name="catatan_tindakan[]" value="' + catatan + '">' + 
-                    
-                    nama_tindakan + '<small class="text-muted">' + catatan_display + '</small></td>' +
-                    
-                    // Input Biaya
-                    '<td><input type="hidden" name="biaya_tindakan[]" value="' + biaya + '">Rp ' + biaya_formatted + '</td>' +
-                    '<td><button type="button" class="btn btn-xs btn-danger btn-hapus-tindakan"><i class="fa fa-times"></i> Hapus</button></td>' +
-                 '</tr>';
+        let id_tindakan = jQuery('#id_tindakan_select').val();
+        let opt = jQuery('#id_tindakan_select option:selected');
 
-    // 3. Update Tabel di Form Utama
-    if (jQuery('#tindakan-list tbody tr td[colspan="3"]').length) { jQuery('#tindakan-list tbody').empty(); }
-    jQuery('#tindakan-list tbody').append(newRow);
-    bindHapusTindakanEvent(); 
+        let nama = opt.text().split(' (Rp ')[0];
+        let biaya = opt.data('biaya');
+        let catatan = jQuery('#catatan_tindakan').val();
 
-    // 4. Reset dan Tutup Modal
-    jQuery('#form-tambah-tindakan')[0].reset(); 
-    jQuery('#id_tindakan_select').val('').trigger('change');
-    jQuery('#modalTindakan').modal('hide');
+        if (!id_tindakan || !biaya) {
+            alert('Mohon pilih tindakan medis.');
+            return;
+        }
+
+        let biaya_format = new Intl.NumberFormat('id-ID').format(biaya);
+        let cat_display = catatan ? ` (${catatan})` : '';
+
+        let row = `
+            <tr>
+                <td>
+                    <input type="hidden" name="id_tindakan[]" value="${id_tindakan}">
+                    <input type="hidden" name="jumlah_tindakan[]" value="1">
+                    <input type="hidden" name="catatan_tindakan[]" value="${catatan}">
+                    ${nama} <small class="text-muted">${cat_display}</small>
+                </td>
+                <td>
+                    <input type="hidden" name="biaya_tindakan[]" value="${biaya}">
+                    Rp ${biaya_format}
+                </td>
+                <td>
+                    <button type="button" class="btn btn-xs btn-danger btn-hapus-tindakan">
+                        <i class="fa fa-times"></i> Hapus
+                    </button>
+                </td>
+            </tr>
+        `;
+
+        if (jQuery('#tindakan-list tbody tr td[colspan="3"]').length) {
+            jQuery('#tindakan-list tbody').empty();
+        }
+
+        jQuery('#tindakan-list tbody').append(row);
+
+        // Reset modal
+        jQuery('#form-tambah-tindakan')[0].reset();
+        jQuery('#id_tindakan_select').val('').trigger('change');
+        jQuery('#modalTindakan').modal('hide');
+
+        bindHapusTindakan();
     });
+
 });
 </script>
 </body>

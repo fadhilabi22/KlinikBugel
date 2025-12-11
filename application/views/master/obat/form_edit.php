@@ -6,8 +6,12 @@
             </div>
             <div class="panel-body">
                 <?php echo validation_errors('<div class="alert alert-danger">', '</div>'); ?>
+                
+                <?php if ($this->session->flashdata('error_upload')): ?>
+                    <div class="alert alert-danger"><?php echo $this->session->flashdata('error_upload'); ?></div>
+                <?php endif; ?>
 
-                <?php echo form_open('master/obat/update'); ?>
+                <?php echo form_open_multipart('master/obat/update'); ?>
 
                     <input type="hidden" name="id_obat" value="<?php echo $obat->id_obat; ?>">
 
@@ -52,6 +56,29 @@
                                value="<?php echo set_value('stok', $obat->stok); ?>"
                                required>
                     </div>
+
+                    <hr>
+                    
+                    <div class="form-group">
+                        <label>Foto Obat Saat Ini</label>
+                        <?php if ($obat->foto_obat): ?>
+                            <div class="mb-2">
+                                <img src="<?php echo base_url('assets/images/obat/' . $obat->foto_obat); ?>" 
+                                     alt="Foto <?php echo $obat->nama_obat; ?>" 
+                                     style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                        <?php else: ?>
+                            <p class="text-muted">Belum ada foto obat.</p>
+                        <?php endif; ?>
+
+                        <label for="foto_obat"><i class="fa fa-upload"></i> Ganti Foto Obat (Opsional)</label>
+                        <input type="file"
+                               class="form-control"
+                               name="foto_obat"
+                               id="foto_obat">
+                        <p class="help-block text-muted">Abaikan jika tidak ingin mengganti foto. Maksimal 2MB. Format: JPG, PNG, GIF.</p>
+                    </div>
+
 
                     <div class="mt-4">
                         <button type="submit" class="btn btn-warning"><i class="fa fa-pencil"></i> Update Data</button>

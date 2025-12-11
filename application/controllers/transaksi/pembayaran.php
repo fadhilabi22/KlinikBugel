@@ -58,48 +58,83 @@ class Pembayaran extends CI_Controller {
 
     // [POST] FUNGSI 3: Menyimpan Transaksi Pembayaran
     public function simpan_pembayaran() {
+    
+    $total_tagihan = $this->input->post('total_tagihan');
+    $id_kunjungan = $this->input->post('id_kunjungan');
+    $jumlah_bayar = $this->input->post('jumlah_bayar');
+    
+    // 1. Validasi Input Kasir
+    $this->form_validation->set_rules('jumlah_bayar', 'Jumlah Bayar', 'required|numeric|greater_than_equal_to[' . $total_tagihan . ']',
+        array('greater_than_equal_to' => 'Uang bayar tidak boleh kurang dari total tagihan.')
+    );
+    
+    if ($this->form_validation->run() == FALSE) {
+        $this->form_tagihan($id_kunjungan); 
+        return;
+    }
+    
+    $id_pengguna_kasir = $this->session->userdata('id_pengguna'); 
+    $kembalian = $jumlah_bayar - $total_tagihan;
+
+    // 2. Data Pembayaran untuk DB
+    $data_pembayaran = [
+        'id_kunjungan'      => $id_kunjungan,
+        'id_pengguna'       => $id_pengguna_kasir, 
+        'tgl_bayar'         => date('Y-m-d H:i:s'), 
+        'total_akhir'       => $total_tagihan, 
+        'status_bayar'      => 'Lunas', 
+        'bukti_bayar'       => NULL, 
+    ];
+
+    // ✅ FIX 1: TANGKAP ID HASIL INSERT
+    // Pastikan M_Pembayaran->save_pembayaran() mengembalikan $this->db->insert_id()
+    $id_pembayaran_baru = $this->M_Pembayaran->save_pembayaran($data_pembayaran);
+
+    if ($id_pembayaran_baru) {
         
-        $total_tagihan = $this->input->post('total_tagihan');
-        $id_kunjungan = $this->input->post('id_kunjungan');
-        $jumlah_bayar = $this->input->post('jumlah_bayar');
+        // Update status kunjungan
+        $this->M_Pendaftaran->update_status($id_kunjungan, 'Selesai');
+
+        // ===================================================
+        // ✅ FIX 2: LOGIC PENYIMPANAN DETAIL TINDAKAN
+        // ===================================================
         
-        // 1. Validasi Input Kasir
-        $this->form_validation->set_rules('jumlah_bayar', 'Jumlah Bayar', 'required|numeric|greater_than_equal_to[' . $total_tagihan . ']',
-            array('greater_than_equal_to' => 'Uang bayar tidak boleh kurang dari total tagihan.')
-        );
+        // 3. Ambil data tindakan dari Session (data ini disisipkan oleh Controller Pemeriksaan)
+        $data_tindakan_dari_session = $this->session->flashdata('data_tindakan');
         
-        if ($this->form_validation->run() == FALSE) {
-            $this->form_tagihan($id_kunjungan); 
-            return;
+        if (!empty($data_tindakan_dari_session)) {
+            
+            $data_tindakan_final = [];
+            foreach($data_tindakan_dari_session as $tindakan) {
+                
+                // Siapkan data detail tindakan
+                $data_tindakan_final[] = [
+                    'id_pembayaran' => $id_pembayaran_baru, // ✅ FIX ERROR 1452: Kunci wajib diisi
+                    'id_rm'         => $tindakan['id_rm'],  // Kunci dari Pemeriksaan (jika sudah ditambahkan di DB)
+                    'id_tindakan'   => $tindakan['id_tindakan'],
+                    'jumlah'        => $tindakan['jumlah'], // Ambil jumlah dari data session
+                ];
+            }
+
+            // 4. Simpan Detail Tindakan
+            // Memanggil fungsi dari M_Pemeriksaan (asumsi sudah dimuat di __construct())
+            $this->M_Pemeriksaan->save_detail_tindakan($data_tindakan_final);
         }
         
-        $id_pengguna_kasir = $this->session->userdata('id_pengguna'); 
-        $kembalian = $jumlah_bayar - $total_tagihan;
-
-        // 2. Simpan ke tbl_pembayaran
-        $data_pembayaran = [
-            'id_kunjungan'      => $id_kunjungan,
-            'id_pengguna'       => $id_pengguna_kasir, 
-            'tgl_bayar'         => date('Y-m-d H:i:s'), 
-            'total_akhir'       => $total_tagihan, 
-            'status_bayar'      => 'Lunas', 
-            'bukti_bayar'       => NULL, 
-            // 🛑 CATATAN: Karena tbl_pembayaran TIDAK punya kolom jumlah_bayar/kembalian,
-            // kita HANYA menyimpannya di flashdata untuk struk.
-        ];
-
-        $this->M_Pembayaran->save_pembayaran($data_pembayaran);
-        $this->M_Pendaftaran->update_status($id_kunjungan, 'Selesai');
+        // --- 5. Feedback dan Redirect ---
         
-        // ✅ FIX: Simpan data bayar dan kembalian ke flashdata sebelum redirect
         $this->session->set_flashdata('jumlah_bayar', $jumlah_bayar);
         $this->session->set_flashdata('kembalian', $kembalian);
-        
         $this->session->set_flashdata('success', 'Pembayaran berhasil! Total: Rp '.number_format($total_tagihan).', Dibayar: Rp '.number_format($jumlah_bayar).', Kembalian: Rp '.number_format($kembalian));
         
         // Redirect ke fungsi cetak struk
         redirect('transaksi/pembayaran/cetak_struk/' . $id_kunjungan);
+
+    } else {
+        $this->session->set_flashdata('error', 'Gagal menyimpan data pembayaran ke database.');
+        redirect('transaksi/pembayaran');
     }
+}
     
     // [GET] FUNGSI 4: Menampilkan Struk Pembayaran
     public function cetak_struk($id_kunjungan) {
