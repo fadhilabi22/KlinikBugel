@@ -12,7 +12,7 @@
         </tr>
     </thead>
     <tbody>
-        <?php $no=1; foreach ($user as $u): ?>
+        <?php $no=1; foreach ($pengguna as $u): ?>
         <tr>
             <td><?= $no++ ?></td>
             <td><?= $u->username ?></td>
