@@ -22,9 +22,7 @@
 <body>
     <div class="main">
         
-        <div class="user">
-            <img src="<?php echo base_url().'assets/img/' ?>user.png" alt="">
-        </div>
+        
         
         <div class="login">
             <div class="inset">

@@ -157,18 +157,27 @@ class Pembayaran extends CI_Controller {
     // Agar hanya konten struk yang dimuat, tanpa header/sidebar.
     $this->load->view('transaksi/pembayaran/struk_cetak', $data);
 }
-public function daftar_struk_selesai() {
-    
-    // Perlu fungsi baru di Model untuk mendapatkan kunjungan berstatus 'Selesai'
-    $data_selesai = $this->M_Pembayaran->get_kunjungan_selesai(); 
+public function daftar_struk_selesai()
+{
+    $keyword = $this->input->get('q', TRUE);
+
+    if ($keyword) {
+        $list = $this->M_Pembayaran->search_kunjungan_selesai($keyword);
+    } else {
+        $list = $this->M_Pembayaran->get_kunjungan_selesai();
+    }
 
     $data = [
-        'title'             => 'Cetak Ulang Struk',
-        'contents'          => 'transaksi/pembayaran/daftar_struk_selesai', 
-        'list_selesai'      => $data_selesai
+        'title'        => 'Cetak Ulang Struk',
+        'contents'     => 'transaksi/pembayaran/daftar_struk_selesai',
+        'list_selesai' => $list,
+        'keyword'      => $keyword
     ];
+
     $this->template->load('template', $data['contents'], $data);
 }
+
+
 public function laporan_pendapatan() {
     $data['title'] = 'Laporan Pendapatan Harian/Bulanan';
     $data['contents'] = 'transaksi/pembayaran/form_laporan_pendapatan'; // View untuk form & hasil

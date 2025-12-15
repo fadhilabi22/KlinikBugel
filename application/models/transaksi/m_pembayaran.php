@@ -165,4 +165,33 @@ public function get_laporan_pendapatan($tgl_awal, $tgl_akhir) {
     
     return $this->db->get()->result();
 }
+public function search_kunjungan_selesai($keyword)
+{
+    $this->db->select('
+        k.id_kunjungan,
+        p.nama_pasien,
+        py.tgl_bayar,
+        py.total_akhir
+    ');
+    $this->db->from('tbl_kunjungan k');
+    $this->db->join('tbl_pasien p', 'p.id_pasien = k.id_pasien');
+    $this->db->join('tbl_pembayaran py', 'py.id_kunjungan = k.id_kunjungan');
+    $this->db->where('k.status_kunjungan', 'Selesai');
+
+    if (!empty($keyword)) {
+        $keyword = $this->db->escape_like_str($keyword);
+
+        $this->db->where(
+            "(p.nama_pasien LIKE '%{$keyword}%' 
+              OR k.id_kunjungan LIKE '%{$keyword}%')",
+            NULL,
+            FALSE
+        );
+    }
+
+    $this->db->order_by('py.tgl_bayar', 'DESC');
+
+    return $this->db->get()->result();
+}
+
 }
