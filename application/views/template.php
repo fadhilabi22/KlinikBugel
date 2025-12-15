@@ -62,8 +62,10 @@
                             <li><a href="<?= base_url('transaksi/pendaftaran') ?>"><i class="fa fa-edit"></i> Pendaftaran Pasien</a></li>
                             <li><a href="<?= base_url('transaksi/pemeriksaan') ?>"><i class="fa fa-clipboard"></i> Antrian & Pemeriksaan</a></li>
                             <li><a href="<?= base_url('transaksi/pembayaran') ?>"><i class="fa fa-money"></i> Pembayaran Kasir</a></li>
+                            <li><a href="<?= base_url('transaksi/riwayat_pasien') ?>"><i class="fa fa-history"></i> Riwayat Pasien</a></li>
                         </ul>
                     </li>
+
 
                     <li>
                         <a href="#"><i class="fa fa-file-text-o"></i> Laporan & Export <span class="fa arrow"></span></a>
