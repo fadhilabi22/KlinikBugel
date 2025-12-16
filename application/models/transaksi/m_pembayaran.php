@@ -146,25 +146,45 @@ public function get_kunjungan_selesai() {
     
     return $this->db->get()->result();
 }
-public function get_laporan_pendapatan($tgl_awal, $tgl_akhir) {
-    
-    // Konversi tanggal untuk mencakup hari penuh
-    $start_datetime = $tgl_awal . ' 00:00:00';
-    $end_datetime = $tgl_akhir . ' 23:59:59';
-    
-    $this->db->select('py.*, p.nama_pasien, k.id_kunjungan');
-    $this->db->from('tbl_pembayaran py');
-    $this->db->join('tbl_kunjungan k', 'k.id_kunjungan = py.id_kunjungan');
+public function get_laporan_pendapatan($tgl_awal, $tgl_akhir, $keyword = null)
+{
+    $this->db->select('
+        k.id_kunjungan,
+        p.nama_pasien,
+        k.tanggal_kunjungan,
+        py.tgl_bayar,
+        py.total_akhir
+    ');
+    $this->db->from('tbl_kunjungan k');
     $this->db->join('tbl_pasien p', 'p.id_pasien = k.id_pasien');
-    
-    // Filter berdasarkan rentang waktu pembayaran
-    $this->db->where('py.tgl_bayar >=', $start_datetime);
-    $this->db->where('py.tgl_bayar <=', $end_datetime);
-    
-    $this->db->order_by('py.tgl_bayar', 'ASC');
-    
+    $this->db->join('tbl_pembayaran py', 'py.id_kunjungan = k.id_kunjungan');
+
+    // ✅ FILTER TANGGAL KUNJUNGAN
+    $this->db->where('DATE(k.tanggal_kunjungan) >=', $tgl_awal);
+    $this->db->where('DATE(k.tanggal_kunjungan) <=', $tgl_akhir);
+
+    // ✅ HANYA YANG SUDAH LUNAS
+    $this->db->where('py.status_bayar', 'Lunas');
+
+    // ✅ SEARCH (TANPA group_start)
+    if (!empty($keyword)) {
+        $keyword = $this->db->escape_like_str($keyword);
+
+        $this->db->where(
+            "(p.nama_pasien LIKE '%{$keyword}%' 
+              OR k.id_kunjungan LIKE '%{$keyword}%')",
+            NULL,
+            FALSE
+        );
+    }
+
+    $this->db->order_by('k.tanggal_kunjungan', 'ASC');
+
     return $this->db->get()->result();
 }
+
+
+
 public function search_kunjungan_selesai($keyword)
 {
     $this->db->select('

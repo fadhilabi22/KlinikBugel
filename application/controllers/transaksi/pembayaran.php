@@ -179,30 +179,37 @@ public function daftar_struk_selesai()
 
 
 public function laporan_pendapatan() {
-    $data['title'] = 'Laporan Pendapatan Harian/Bulanan';
-    $data['contents'] = 'transaksi/pembayaran/form_laporan_pendapatan'; // View untuk form & hasil
-    $data['laporan'] = []; // Inisiasi array kosong
-    $data['tgl_awal'] = date('Y-m-01'); // Default awal bulan
-    $data['tgl_akhir'] = date('Y-m-d'); // Default hari ini
+
+    $data['title']     = 'Laporan Pendapatan Harian/Bulanan';
+    $data['contents']  = 'transaksi/pembayaran/form_laporan_pendapatan';
+    $data['laporan']   = [];
+    $data['tgl_awal']  = date('Y-m-01');
+    $data['tgl_akhir'] = date('Y-m-d');
+    $data['keyword']   = ''; // ✅ TAMBAH
 
     if ($this->input->post()) {
-        // Jika ada data POST, proses laporan
-        $tgl_awal = $this->input->post('tgl_awal', TRUE);
-        $tgl_akhir = $this->input->post('tgl_akhir', TRUE);
 
-        // Validasi tanggal
+        $tgl_awal  = $this->input->post('tgl_awal', TRUE);
+        $tgl_akhir = $this->input->post('tgl_akhir', TRUE);
+        $keyword   = $this->input->post('keyword', TRUE); // ✅ TAMBAH
+
         if (empty($tgl_awal) || empty($tgl_akhir)) {
-            $this->session->set_flashdata('error', 'Tanggal awal dan tanggal akhir wajib diisi.');
+            $this->session->set_flashdata('error', 'Tanggal awal dan akhir wajib diisi');
         } else {
-            // Panggil Model untuk mendapatkan data laporan
-            $data['laporan'] = $this->M_Pembayaran->get_laporan_pendapatan($tgl_awal, $tgl_akhir);
-            $data['tgl_awal'] = $tgl_awal;
+
+            // ✅ KIRIM KEYWORD KE MODEL
+            $data['laporan'] = $this->M_Pembayaran
+                ->get_laporan_pendapatan($tgl_awal, $tgl_akhir, $keyword);
+
+            $data['tgl_awal']  = $tgl_awal;
             $data['tgl_akhir'] = $tgl_akhir;
+            $data['keyword']   = $keyword;
         }
     }
-    
+
     $this->template->load('template', $data['contents'], $data);
 }
+
 // DI Controller Pembayaran.php::export_excel()
 
 public function export_excel() {
@@ -274,32 +281,32 @@ public function export_pdf() {
     $pdf->Ln(5);
 
     // Header Tabel
-    $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(10, 6, 'NO', 1, 0, 'C');
-    $pdf->Cell(30, 6, 'ID KUNJ.', 1, 0, 'C');
-    $pdf->Cell(50, 6, 'NAMA PASIEN', 1, 0, 'C');
-    $pdf->Cell(40, 6, 'TGL BAYAR', 1, 0, 'C');
-    $pdf->Cell(40, 6, 'TOTAL TAGIHAN (Rp)', 1, 1, 'C'); 
+    $pdf->Cell(60, 6, 'NAMA PASIEN', 1, 0, 'C');
+    $pdf->Cell(50, 6, 'TGL BAYAR', 1, 0, 'C');
+    $pdf->Cell(40, 6, 'TOTAL TAGIHAN (Rp)', 1, 1, 'C');
+
     
     // Isi Tabel
     $pdf->SetFont('Arial', '', 9);
     $no = 1;
     $grand_total = 0;
-    
+
     foreach ($laporan as $item) {
         $grand_total += $item->total_akhir;
-        
-        $pdf->Cell(10, 6, $no++, 1, 0, 'C');
-        $pdf->Cell(30, 6, $item->id_kunjungan, 1, 0);
-        $pdf->Cell(50, 6, $item->nama_pasien, 1, 0);
-        $pdf->Cell(40, 6, date('d-m-Y H:i', strtotime($item->tgl_bayar)), 1, 0);
-        $pdf->Cell(40, 6, number_format($item->total_akhir, 0, ',', '.'), 1, 1, 'R');
-    }
+
+    $pdf->Cell(10, 6, $no++, 1, 0, 'C');
+    $pdf->Cell(60, 6, $item->nama_pasien, 1, 0);
+    $pdf->Cell(50, 6, date('d-m-Y H:i', strtotime($item->tgl_bayar)), 1, 0);
+    $pdf->Cell(40, 6, number_format($item->total_akhir, 0, ',', '.'), 1, 1, 'R');
+}
+
     
     // Footer Total
     $pdf->SetFont('Arial', 'B', 9);
-    $pdf->Cell(130, 6, 'GRAND TOTAL PENDAPATAN BERSIH', 1, 0, 'R');
+    $pdf->Cell(120, 6, 'GRAND TOTAL PENDAPATAN BERSIH', 1, 0, 'R');
     $pdf->Cell(40, 6, number_format($grand_total, 0, ',', '.'), 1, 1, 'R');
+
     
     // Output PDF
     $pdf->Output('I', 'Laporan_Pendapatan_' . date('Ymd') . '.pdf'); 
