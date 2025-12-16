@@ -54,9 +54,7 @@
                             <tr>
                                 <th>No</th>
                                 <th>Nama Dokter</th>
-                                <th>Spesialisasi</th>
                                 <th>No Izin</th>
-                                <th>Tarif</th>
                                 <th width="120">Aksi</th>
                             </tr>
                         </thead>
@@ -67,9 +65,7 @@
                                     <tr>
                                         <td><?= $no++; ?></td>
                                         <td><?= $row->nama_dokter; ?></td>
-                                        <td><?= $row->spesialisasi; ?></td>
                                         <td><?= $row->no_izin; ?></td>
-                                        <td>Rp <?= number_format($row->tarif, 0, ',', '.'); ?></td>
                                         <td class="text-center">
                                             <a href="<?= site_url('master/dokter/edit/'.$row->id_dokter); ?>"
                                                class="btn btn-warning btn-sm"><i class="fa fa-pencil"></i></a>

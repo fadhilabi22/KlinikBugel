@@ -42,19 +42,7 @@
                         >
                     </div>
 
-                    <div class="form-group">
-                        <label>Tarif Konsultasi (Rp)</label>
-                        <input 
-                            type="number" 
-                            class="form-control"
-                            name="tarif"
-                            value="<?= set_value('tarif', $dokter->tarif) ?>"
-                            required
-                        >
-                        <small class="text-muted">
-                            Tarif diisi manual atau sesuai ketentuan klinik.
-                        </small>
-                    </div>
+                    
 
                     <button type="submit" class="btn btn-warning">
                         <i class="fa fa-pencil"></i> Update Data
