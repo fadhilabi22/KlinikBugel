@@ -91,44 +91,54 @@ class M_Pembayaran extends CI_Model {
      * Mengambil data lengkap untuk keperluan cetak struk.
      * ✅ FIX 5: Mengambil data pembayaran (py) untuk dicetak.
      */
-    public function get_data_struk($id_kunjungan) {
-    
-    // 1. Ambil semua data dasar + data pembayaran (py)
-    $this->db->select('k.*, rm.id_rm, rm.diagnosa, p.nama_pasien, p.alamat, 
-                       py.id_pembayaran, py.tgl_bayar, py.total_akhir'); 
+public function get_data_struk($id_kunjungan)
+{
+    // 1. Data utama + pembayaran (FIX: ambil bukti_bayar)
+    $this->db->select('
+        k.id_kunjungan,
+        p.nama_pasien,
+        rm.id_rm,
+        py.id_pembayaran,
+        py.tgl_bayar,
+        py.total_akhir,
+        py.bukti_bayar
+    ');
     $this->db->from('tbl_kunjungan k');
     $this->db->join('tbl_rekam_medis rm', 'rm.id_kunjungan = k.id_kunjungan');
     $this->db->join('tbl_pasien p', 'p.id_pasien = k.id_pasien');
-    $this->db->join('tbl_pembayaran py', 'py.id_kunjungan = k.id_kunjungan'); 
+    $this->db->join('tbl_pembayaran py', 'py.id_kunjungan = k.id_kunjungan');
     $this->db->where('k.id_kunjungan', $id_kunjungan);
+
     $struk = $this->db->get()->row();
 
-    if (!$struk || empty($struk->id_rm)) {
+    if (!$struk) {
         return FALSE;
     }
 
     $id_rm = $struk->id_rm;
-    $id_pembayaran = $struk->id_pembayaran; 
-    
-    // 2. Ambil detail Resep (sesuai id_rm)
-    $struk->resep = $this->db->select('ro.*, o.nama_obat, o.harga_jual')
-                            ->from('tbl_resep_obat ro')
-                            ->join('tbl_obat o', 'o.id_obat = ro.id_obat')
-                            ->where('ro.id_rm', $id_rm) 
-            
+    $id_pembayaran = $struk->id_pembayaran;
 
-                        
-                            ->get()->result();
+    // 2. Resep
+    $struk->resep = $this->db
+        ->select('ro.jumlah, o.nama_obat, o.harga_jual')
+        ->from('tbl_resep_obat ro')
+        ->join('tbl_obat o', 'o.id_obat = ro.id_obat')
+        ->where('ro.id_rm', $id_rm)
+        ->get()
+        ->result();
 
-    // 3. Ambil detail Tindakan (sesuai id_pembayaran)
-    $struk->tindakan = $this->db->select('dt.jumlah, t.nama_tindakan, t.biaya_tindakan') 
-                               ->from('tbl_detail_tindakan dt')
-                               ->join('tbl_tindakan t', 't.id_tindakan = dt.id_tindakan')
-                               ->where('dt.id_pembayaran', $id_pembayaran) 
-                               ->get()->result();
+    // 3. Tindakan
+    $struk->tindakan = $this->db
+        ->select('dt.jumlah, t.nama_tindakan, t.biaya_tindakan')
+        ->from('tbl_detail_tindakan dt')
+        ->join('tbl_tindakan t', 't.id_tindakan = dt.id_tindakan')
+        ->where('dt.id_pembayaran', $id_pembayaran)
+        ->get()
+        ->result();
 
     return $struk;
-    }
+}
+
 public function get_kunjungan_selesai() {
     $this->db->select('k.id_kunjungan, p.nama_pasien, py.tgl_bayar, py.total_akhir');
     $this->db->from('tbl_kunjungan k');

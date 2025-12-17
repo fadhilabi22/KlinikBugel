@@ -178,26 +178,26 @@ if (!empty($_FILES['bukti_bayar']['name'])) {
 
     
     // [GET] FUNGSI 4: Menampilkan Struk Pembayaran
-    public function cetak_struk($id_kunjungan) {
-    
-    // Memanggil Model untuk mendapatkan detail tagihan + data pembayaran
-    $struk = $this->M_Pembayaran->get_data_struk($id_kunjungan); 
-    
+    public function cetak_struk($id_kunjungan)
+{
+    $struk = $this->M_Pembayaran->get_data_struk($id_kunjungan);
+
     if (!$struk) {
-        $this->session->set_flashdata('error', 'Data struk tidak ditemukan atau pembayaran belum lunas.');
+        $this->session->set_flashdata(
+            'error',
+            'Data struk tidak ditemukan atau pembayaran belum lunas.'
+        );
         redirect('transaksi/pembayaran');
     }
 
     $data = [
-        // 'title'          => 'Cetak Struk Pembayaran', // Tidak perlu di view murni
-        'struk'          => $struk
-        // Flashdata (jumlah_bayar, kembalian) otomatis tersedia
+        'struk' => $struk
     ];
-    
-    // 🛑 FIX UTAMA: GUNAKAN load->view() BUKAN template->load()
-    // Agar hanya konten struk yang dimuat, tanpa header/sidebar.
+
+    // View murni (tanpa template)
     $this->load->view('transaksi/pembayaran/struk_cetak', $data);
 }
+
 public function daftar_struk_selesai()
 {
     $keyword = $this->input->get('q', TRUE);
