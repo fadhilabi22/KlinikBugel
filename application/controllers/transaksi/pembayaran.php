@@ -109,7 +109,7 @@ class Pembayaran extends CI_Controller {
                 
                 // Siapkan data detail tindakan
                 $data_tindakan_final[] = [
-                    'id_pembayaran' => $id_pembayaran_baru, // ✅ FIX ERROR 1452: Kunci wajib diisi
+                    'id_pembayaran' => $id_pembayaran_baru, 
                     'id_rm'         => $tindakan['id_rm'],  // Kunci dari Pemeriksaan (jika sudah ditambahkan di DB)
                     'id_tindakan'   => $tindakan['id_tindakan'],
                     'jumlah'        => $tindakan['jumlah'], // Ambil jumlah dari data session

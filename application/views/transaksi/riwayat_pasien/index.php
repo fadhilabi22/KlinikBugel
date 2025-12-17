@@ -1,8 +1,6 @@
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">
-            <i class="fa fa-history"></i> Riwayat Pasien (Dummy)
-        </h3>
+        <h3><i class="fa fa-history"></i> Riwayat Pasien</h3>
     </div>
 
     <div class="panel-body">
@@ -10,39 +8,42 @@
             <table class="table table-bordered table-striped table-hover">
                 <thead>
                     <tr>
-                        <th>No</th>
+                        <th width="40">No</th>
                         <th>ID Kunjungan</th>
                         <th>Nama Pasien</th>
-                        <th>Tanggal Kunjungan</th>
-                        <th>Dokter</th>
+                        <th>Tanggal Bayar</th>
+                        <th>Total Bayar</th>
                         <th>Status</th>
                     </tr>
                 </thead>
+
                 <tbody>
+                <?php if(!empty($riwayat)): ?>
+                    <?php $no=1; foreach($riwayat as $r): ?>
                     <tr>
-                        <td>1</td>
-                        <td>22</td>
-                        <td>RAFA</td>
-                        <td>15-12-2025</td>
-                        <td>dr. Andi</td>
-                        <td><span class="label label-success">Selesai</span></td>
+                        <td><?= $no++ ?></td>
+                        <td><?= $r->id_kunjungan ?></td>
+                        <td><?= $r->nama_pasien ?></td>
+                        <td>
+                            <?= $r->tgl_bayar 
+                                ? date('d-m-Y H:i', strtotime($r->tgl_bayar)) 
+                                : '-' ?>
+                        </td>
+                        <td>Rp <?= number_format($r->total_akhir,0,',','.') ?></td>
+                        <td>
+                            <span class="label label-success">
+                                <?= $r->status_bayar ?>
+                            </span>
+                        </td>
                     </tr>
+                    <?php endforeach ?>
+                <?php else: ?>
                     <tr>
-                        <td>2</td>
-                        <td>20</td>
-                        <td>Aqil</td>
-                        <td>10-12-2025</td>
-                        <td>dr. Budi</td>
-                        <td><span class="label label-success">Selesai</span></td>
+                        <td colspan="6" class="text-center text-muted">
+                            <i class="fa fa-info-circle"></i> Data riwayat belum ada
+                        </td>
                     </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>18</td>
-                        <td>Dhani</td>
-                        <td>10-12-2025</td>
-                        <td>dr. Citra</td>
-                        <td><span class="label label-warning">Menunggu</span></td>
-                    </tr>
+                <?php endif ?>
                 </tbody>
             </table>
         </div>
