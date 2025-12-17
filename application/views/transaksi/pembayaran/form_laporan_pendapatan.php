@@ -26,33 +26,40 @@
     }
 }
 </style>
-
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-default">
 
+            <!-- ================= HEADER ================= -->
             <div class="panel-heading no-print">
                 <h3 class="panel-title">
-                    <i class="fa fa-bar-chart"></i> Laporan Pendapatan Harian / Bulanan
+                    <i class="fa fa-bar-chart"></i>
+                    Laporan Pendapatan (Berdasarkan Tanggal Pembayaran)
                 </h3>
             </div>
 
             <div class="panel-body">
 
+                <!-- INFO -->
+                <p class="text-muted no-print">
+                    Laporan ini menampilkan pendapatan klinik berdasarkan
+                    <strong>tanggal pembayaran pasien</strong>.
+                </p>
+
                 <!-- ================= FORM FILTER ================= -->
-                <?php echo form_open('transaksi/pembayaran/laporan_pendapatan', [
+                <?= form_open('transaksi/pembayaran/laporan_pendapatan', [
                     'method' => 'post',
                     'class'  => 'form-inline no-print'
                 ]); ?>
 
                 <div class="form-group">
-                    <label>Dari Tanggal:</label>
+                    <label>Dari Tanggal Pembayaran:</label>
                     <input type="date" name="tgl_awal" class="form-control"
                            value="<?= html_escape($tgl_awal); ?>" required>
                 </div>
 
                 <div class="form-group" style="margin-left:10px;">
-                    <label>Sampai Tanggal:</label>
+                    <label>Sampai Tanggal Pembayaran:</label>
                     <input type="date" name="tgl_akhir" class="form-control"
                            value="<?= html_escape($tgl_akhir); ?>" required>
                 </div>
@@ -68,7 +75,7 @@
                     <i class="fa fa-search"></i> Tampilkan
                 </button>
 
-                <?php echo form_close(); ?>
+                <?= form_close(); ?>
                 <hr class="no-print">
 
                 <!-- ================= AREA CETAK ================= -->
@@ -79,11 +86,16 @@
                     <h3 class="text-center">
                         LAPORAN PENDAPATAN KLINIK BUGEL
                     </h3>
+
                     <p class="text-center">
-                        Periode:
+                        Periode Pembayaran:
                         <?= date('d/m/Y', strtotime($tgl_awal)); ?>
                         s/d
                         <?= date('d/m/Y', strtotime($tgl_akhir)); ?>
+                        <br>
+                        <small class="text-muted">
+                            * Data ditampilkan berdasarkan tanggal pembayaran pasien
+                        </small>
                     </p>
 
                     <table class="table table-bordered">
@@ -91,7 +103,7 @@
                             <tr>
                                 <th width="5%">No</th>
                                 <th>Nama Pasien</th>
-                                <th>Tanggal Bayar</th>
+                                <th>Tanggal Pembayaran</th>
                                 <th>Total Tagihan</th>
                             </tr>
                         </thead>
@@ -104,7 +116,7 @@
                             ?>
                             <tr>
                                 <td><?= $no++; ?></td>
-                                <td><?= $item->nama_pasien; ?></td>
+                                <td><?= html_escape($item->nama_pasien); ?></td>
                                 <td><?= date('d-m-Y H:i', strtotime($item->tgl_bayar)); ?></td>
                                 <td>Rp <?= number_format($item->total_akhir,0,',','.'); ?></td>
                             </tr>
@@ -148,7 +160,7 @@
                 <?php else: ?>
 
                     <div class="alert alert-info">
-                        Silahkan pilih rentang tanggal.
+                        Tidak ada data pembayaran pada periode yang dipilih.
                     </div>
 
                 <?php endif; ?>

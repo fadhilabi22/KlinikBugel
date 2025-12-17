@@ -115,14 +115,9 @@ class M_Pembayaran extends CI_Model {
                             ->from('tbl_resep_obat ro')
                             ->join('tbl_obat o', 'o.id_obat = ro.id_obat')
                             ->where('ro.id_rm', $id_rm) 
-                            // 🛑 PERKUAT FILTER: Jika data Resep duplikat, ini pasti karena
-                            // RM yang sedang dibayar TIDAK TERPISAH dari RM lama
-                            // TIDAK ADA KOLOM ID KUNJUNGAN DI TBL RESEP (cite: image_158d37.png),
-                            // Maka id_rm HARUS UNIK PER KUNJUNGAN!
+            
 
-                            // Saya hapus filter tambahan karena Anda tidak punya kolom lain selain id_rm
-                            // dan id_rm sudah diambil dari kunjungan saat ini.
-                            // Jika Resep duplikat, masalahnya di input data, bukan di sini.
+                        
                             ->get()->result();
 
     // 3. Ambil detail Tindakan (sesuai id_pembayaran)

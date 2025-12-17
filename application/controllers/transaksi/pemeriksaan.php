@@ -188,8 +188,7 @@ class Pemeriksaan extends CI_Controller {
         
         // 5b. Sisipkan Tindakan (KRUSIAL: Agar tidak terjadi Error 1452 FK)
         if (!empty($data_tindakan)) {
-            // Asumsi Model Anda memiliki fungsi untuk menyimpan tindakan:
-            // $this->M_Pemeriksaan->save_tindakan($data_tindakan); // Jika Anda punya fungsi ini
+            
             
             // Jika Anda ingin mengirim ke Kasir, gunakan flashdata:
             $this->session->set_flashdata('data_tindakan', $data_tindakan);

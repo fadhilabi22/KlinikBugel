@@ -58,83 +58,124 @@ class Pembayaran extends CI_Controller {
 
     // [POST] FUNGSI 3: Menyimpan Transaksi Pembayaran
     public function simpan_pembayaran() {
-    
-    $total_tagihan = $this->input->post('total_tagihan');
-    $id_kunjungan = $this->input->post('id_kunjungan');
-    $jumlah_bayar = $this->input->post('jumlah_bayar');
-    
-    // 1. Validasi Input Kasir
-    $this->form_validation->set_rules('jumlah_bayar', 'Jumlah Bayar', 'required|numeric|greater_than_equal_to[' . $total_tagihan . ']',
-        array('greater_than_equal_to' => 'Uang bayar tidak boleh kurang dari total tagihan.')
-    );
-    
-    if ($this->form_validation->run() == FALSE) {
-        $this->form_tagihan($id_kunjungan); 
+
+    $total_tagihan     = (int)$this->input->post('total_tagihan');
+    $id_kunjungan      = $this->input->post('id_kunjungan');
+    $jumlah_bayar      = (int)$this->input->post('jumlah_bayar');
+    $metode_pembayaran = $this->input->post('metode_pembayaran');
+
+    // fallback keamanan
+    if (!$metode_pembayaran) {
+        $metode_pembayaran = !empty($_FILES['bukti_bayar']['name'])
+            ? 'transfer'
+            : 'cash';
+    }
+
+    // ================= VALIDASI =================
+    if ($metode_pembayaran == 'cash') {
+
+        $this->form_validation->set_rules(
+            'jumlah_bayar',
+            'Jumlah Bayar',
+            'required|numeric|greater_than_equal_to['.$total_tagihan.']',
+            ['greater_than_equal_to' => 'Uang bayar tidak boleh kurang dari total tagihan.']
+        );
+
+        if ($this->form_validation->run() == FALSE) {
+            $this->form_tagihan($id_kunjungan);
+            return;
+        }
+
+    } else { // TRANSFER
+
+        $jumlah_bayar = $total_tagihan;
+
+        if (empty($_FILES['bukti_bayar']['name'])) {
+            $this->session->set_flashdata(
+                'error',
+                'Bukti pembayaran WAJIB diupload untuk metode transfer.'
+            );
+            $this->form_tagihan($id_kunjungan);
+            return;
+        }
+    }
+
+    $id_pengguna_kasir = $this->session->userdata('id_pengguna');
+
+    // ================= UPLOAD BUKTI =================
+   $bukti_bayar = NULL;
+
+if (!empty($_FILES['bukti_bayar']['name'])) {
+
+    // ✅ PATH ABSOLUT (SESUAI FOLDER KAMU)
+    $upload_path = FCPATH . 'assets/img/buktibayar/';
+
+    // ✅ JAGA-JAGA KALAU FOLDER KEHAPUS
+    if (!is_dir($upload_path)) {
+        mkdir($upload_path, 0777, true);
+    }
+
+    $config['upload_path']   = $upload_path;
+    $config['allowed_types'] = 'jpg|jpeg|png';
+    $config['max_size']      = 2048;
+    $config['encrypt_name']  = TRUE;
+
+    // 🔄 RELOAD LIBRARY BIAR CONFIG KE-RESET
+    $this->load->library('upload');
+    $this->upload->initialize($config);
+
+    if (!$this->upload->do_upload('bukti_bayar')) {
+
+        $this->session->set_flashdata(
+            'error',
+            'Upload bukti pembayaran gagal: ' .
+            strip_tags($this->upload->display_errors())
+        );
+
+        $this->form_tagihan($id_kunjungan);
         return;
     }
-    
-    $id_pengguna_kasir = $this->session->userdata('id_pengguna'); 
-    $kembalian = $jumlah_bayar - $total_tagihan;
 
-    // 2. Data Pembayaran untuk DB
+    // ✅ AMBIL NAMA FILE YANG DISIMPAN
+    $upload_data = $this->upload->data();
+    $bukti_bayar = $upload_data['file_name'];
+}
+
+
+    // ================= HITUNG KEMBALIAN =================
+    $kembalian = ($metode_pembayaran == 'cash')
+        ? ($jumlah_bayar - $total_tagihan)
+        : 0;
+
+    // ================= DATA PEMBAYARAN =================
     $data_pembayaran = [
         'id_kunjungan'      => $id_kunjungan,
-        'id_pengguna'       => $id_pengguna_kasir, 
-        'tgl_bayar'         => date('Y-m-d H:i:s'), 
-        'total_akhir'       => $total_tagihan, 
-        'status_bayar'      => 'Lunas', 
-        'bukti_bayar'       => NULL, 
+        'id_pengguna'       => $id_pengguna_kasir,
+        'tgl_bayar'         => date('Y-m-d H:i:s'),
+        'total_akhir'       => $total_tagihan,
+        'metode_pembayaran' => $metode_pembayaran, // 🔥 PENTING
+        'status_bayar'      => 'Lunas',
+        'bukti_bayar'       => $bukti_bayar
     ];
 
-    // ✅ FIX 1: TANGKAP ID HASIL INSERT
-    // Pastikan M_Pembayaran->save_pembayaran() mengembalikan $this->db->insert_id()
     $id_pembayaran_baru = $this->M_Pembayaran->save_pembayaran($data_pembayaran);
 
-    if ($id_pembayaran_baru) {
-        
-        // Update status kunjungan
-        $this->M_Pendaftaran->update_status($id_kunjungan, 'Selesai');
-
-        // ===================================================
-        // ✅ FIX 2: LOGIC PENYIMPANAN DETAIL TINDAKAN
-        // ===================================================
-        
-        // 3. Ambil data tindakan dari Session (data ini disisipkan oleh Controller Pemeriksaan)
-        $data_tindakan_dari_session = $this->session->flashdata('data_tindakan');
-        
-        if (!empty($data_tindakan_dari_session)) {
-            
-            $data_tindakan_final = [];
-            foreach($data_tindakan_dari_session as $tindakan) {
-                
-                // Siapkan data detail tindakan
-                $data_tindakan_final[] = [
-                    'id_pembayaran' => $id_pembayaran_baru, 
-                    'id_rm'         => $tindakan['id_rm'],  // Kunci dari Pemeriksaan (jika sudah ditambahkan di DB)
-                    'id_tindakan'   => $tindakan['id_tindakan'],
-                    'jumlah'        => $tindakan['jumlah'], // Ambil jumlah dari data session
-                ];
-            }
-
-            // 4. Simpan Detail Tindakan
-            // Memanggil fungsi dari M_Pemeriksaan (asumsi sudah dimuat di __construct())
-            $this->M_Pemeriksaan->save_detail_tindakan($data_tindakan_final);
-        }
-        
-        // --- 5. Feedback dan Redirect ---
-        
-        $this->session->set_flashdata('jumlah_bayar', $jumlah_bayar);
-        $this->session->set_flashdata('kembalian', $kembalian);
-        $this->session->set_flashdata('success', 'Pembayaran berhasil! Total: Rp '.number_format($total_tagihan).', Dibayar: Rp '.number_format($jumlah_bayar).', Kembalian: Rp '.number_format($kembalian));
-        
-        // Redirect ke fungsi cetak struk
-        redirect('transaksi/pembayaran/cetak_struk/' . $id_kunjungan);
-
-    } else {
-        $this->session->set_flashdata('error', 'Gagal menyimpan data pembayaran ke database.');
+    if (!$id_pembayaran_baru) {
+        $this->session->set_flashdata('error', 'Gagal menyimpan data pembayaran.');
         redirect('transaksi/pembayaran');
     }
+
+    // Update status kunjungan
+    $this->M_Pendaftaran->update_status($id_kunjungan, 'Selesai');
+
+    // ================= FEEDBACK =================
+    $this->session->set_flashdata('jumlah_bayar', $jumlah_bayar);
+    $this->session->set_flashdata('kembalian', $kembalian);
+
+    redirect('transaksi/pembayaran/cetak_struk/'.$id_kunjungan);
 }
+
+
     
     // [GET] FUNGSI 4: Menampilkan Struk Pembayaran
     public function cetak_struk($id_kunjungan) {
@@ -178,28 +219,55 @@ public function daftar_struk_selesai()
 }
 
 
-public function laporan_pendapatan() {
-
+public function laporan_pendapatan()
+{
     $data['title']     = 'Laporan Pendapatan Harian/Bulanan';
     $data['contents']  = 'transaksi/pembayaran/form_laporan_pendapatan';
     $data['laporan']   = [];
     $data['tgl_awal']  = date('Y-m-01');
     $data['tgl_akhir'] = date('Y-m-d');
-    $data['keyword']   = ''; // ✅ TAMBAH
+    $data['keyword']   = '';
 
     if ($this->input->post()) {
 
         $tgl_awal  = $this->input->post('tgl_awal', TRUE);
         $tgl_akhir = $this->input->post('tgl_akhir', TRUE);
-        $keyword   = $this->input->post('keyword', TRUE); // ✅ TAMBAH
+        $keyword   = $this->input->post('keyword', TRUE);
 
+        // ================= VALIDASI =================
         if (empty($tgl_awal) || empty($tgl_akhir)) {
-            $this->session->set_flashdata('error', 'Tanggal awal dan akhir wajib diisi');
+
+            $this->session->set_flashdata(
+                'error',
+                'Tanggal awal dan tanggal akhir wajib diisi'
+            );
+
+        } elseif ($tgl_awal > $tgl_akhir) {
+
+            $this->session->set_flashdata(
+                'error',
+                'Tanggal awal tidak boleh lebih besar dari tanggal akhir'
+            );
+
         } else {
 
-            // ✅ KIRIM KEYWORD KE MODEL
-            $data['laporan'] = $this->M_Pembayaran
+            $laporan = $this->M_Pembayaran
                 ->get_laporan_pendapatan($tgl_awal, $tgl_akhir, $keyword);
+
+            // ✅ VALIDASI DATA KOSONG
+            if (empty($laporan)) {
+
+                $this->session->set_flashdata(
+                    'warning',
+                    'Data pendapatan tidak ditemukan pada rentang tanggal tersebut'
+                );
+
+                $data['laporan'] = [];
+
+            } else {
+
+                $data['laporan'] = $laporan;
+            }
 
             $data['tgl_awal']  = $tgl_awal;
             $data['tgl_akhir'] = $tgl_akhir;
@@ -209,6 +277,7 @@ public function laporan_pendapatan() {
 
     $this->template->load('template', $data['contents'], $data);
 }
+
 
 // DI Controller Pembayaran.php::export_excel()
 

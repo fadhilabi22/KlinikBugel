@@ -70,18 +70,28 @@
                     <li>
                         <a href="#"><i class="fa fa-file-text-o"></i> Laporan & Export <span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
+
                             <li>
-                                <a href="<?php echo site_url('transaksi/pembayaran/laporan_pendapatan'); ?>">
-                                    <i class="fa fa-calendar"></i> Laporan Harian/Bulanan
+                                <a href="<?= site_url('transaksi/pembayaran/laporan_pendapatan'); ?>">
+                                    <i class="fa fa-calendar"></i> Laporan Pendapatan
                                 </a>
                             </li>
+
                             <li>
-                                <a href="<?php echo site_url('transaksi/pembayaran/daftar_struk_selesai'); ?>">
+                                <a href="<?= site_url('transaksi/laporan_rekam_medis'); ?>">
+                                    <i class="fa fa-stethoscope"></i> Laporan Rekam Medis
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="<?= site_url('transaksi/pembayaran/daftar_struk_selesai'); ?>">
                                     <i class="fa fa-print"></i> Cetak Ulang Struk
                                 </a>
                             </li>
+
                         </ul>
                     </li>
+
 
                     <li><a href="<?= base_url('auth/logout') ?>"><i class="fa fa-sign-out"></i> Keluar</a></li>
                 </ul>
