@@ -149,14 +149,17 @@ if (!empty($_FILES['bukti_bayar']['name'])) {
 
     // ================= DATA PEMBAYARAN =================
     $data_pembayaran = [
-        'id_kunjungan'      => $id_kunjungan,
-        'id_pengguna'       => $id_pengguna_kasir,
-        'tgl_bayar'         => date('Y-m-d H:i:s'),
-        'total_akhir'       => $total_tagihan,
-        'metode_pembayaran' => $metode_pembayaran, // 🔥 PENTING
-        'status_bayar'      => 'Lunas',
-        'bukti_bayar'       => $bukti_bayar
-    ];
+    'id_kunjungan'      => $id_kunjungan,
+    'id_pengguna'       => $id_pengguna_kasir,
+    'tgl_bayar'         => date('Y-m-d H:i:s'),
+    'total_akhir'       => $total_tagihan,
+    'jumlah_bayar'      => $jumlah_bayar,   // ✅ FIX
+    'kembalian'         => $kembalian,       // ✅ FIX
+    'metode_pembayaran' => $metode_pembayaran,
+    'status_bayar'      => 'Lunas',
+    'bukti_bayar'       => $bukti_bayar
+];
+
 
     $id_pembayaran_baru = $this->M_Pembayaran->save_pembayaran($data_pembayaran);
 

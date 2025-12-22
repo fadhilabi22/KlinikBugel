@@ -95,14 +95,17 @@ public function get_data_struk($id_kunjungan)
 {
     // 1. Data utama + pembayaran (FIX: ambil bukti_bayar)
     $this->db->select('
-        k.id_kunjungan,
-        p.nama_pasien,
-        rm.id_rm,
-        py.id_pembayaran,
-        py.tgl_bayar,
-        py.total_akhir,
-        py.bukti_bayar
-    ');
+    k.id_kunjungan,
+    p.nama_pasien,
+    rm.id_rm,
+    py.id_pembayaran,
+    py.tgl_bayar,
+    py.total_akhir,
+    py.jumlah_bayar,   
+    py.kembalian,      
+    py.bukti_bayar
+');
+
     $this->db->from('tbl_kunjungan k');
     $this->db->join('tbl_rekam_medis rm', 'rm.id_kunjungan = k.id_kunjungan');
     $this->db->join('tbl_pasien p', 'p.id_pasien = k.id_pasien');
