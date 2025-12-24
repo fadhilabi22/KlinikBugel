@@ -24,10 +24,11 @@ class M_laporan_rekam_medis extends CI_Model {
             rm.keluhan,
             rm.diagnosa,
             rm.catatan_medis,
-            rm.tgl_pemeriksaan,
+            rm.tgl_pemeriksaan AS tanggal,
             p.nama_pasien,
             d.nama_dokter
         ');
+
         $this->db->from('tbl_rekam_medis rm');
         $this->db->join('tbl_kunjungan k', 'k.id_kunjungan = rm.id_kunjungan');
         $this->db->join('tbl_pasien p', 'p.id_pasien = k.id_pasien');
