@@ -86,7 +86,7 @@
                 </tbody>
             </table>
 
-            <!-- 🔥 BUKTI BAYAR -->
+            <!--  BUKTI BAYAR -->
             <?php if (!empty($struk->bukti_bayar)) : ?>
                 <div class="bukti-bayar" style="margin-top:15px;border-top:1px dashed #000;padding-top:10px;">
                     <strong style="font-size:9pt;">Bukti Pembayaran:</strong><br>

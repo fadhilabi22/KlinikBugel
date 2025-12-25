@@ -27,7 +27,7 @@
                             <strong>Data Tanda Vital (VS):</strong>
                             <pre style="margin-top: 5px; background-color: #f9f9f9; border: 1px solid #eee; padding: 5px;">
                             <?php 
-                            // Kita tampilkan data Vital Sign dari kolom catatan_medis yang sudah digabungkan
+                            
                             echo isset($rekam_medis->catatan_medis) ? $rekam_medis->catatan_medis : 'Data VS belum tercatat.'; 
                             ?>
                             </pre>

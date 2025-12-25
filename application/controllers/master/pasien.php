@@ -10,9 +10,7 @@ class Pasien extends CI_Controller {
         $this->load->helper('url');
     }
 
-    // =========================
-    // LIST PASIEN
-    // =========================
+    
     public function index() {
 
         $keyword = $this->input->get('keyword');
@@ -30,9 +28,7 @@ class Pasien extends CI_Controller {
         $this->template->load('template', $data['contents'], $data);
     }
 
-    // =========================
-    // FORM INPUT
-    // =========================
+    
     public function input() {
         $data = [
             'title'     => 'Tambah Pasien Baru',
@@ -41,10 +37,7 @@ class Pasien extends CI_Controller {
         $this->template->load('template', $data['contents'], $data);
     }
 
-    // =========================
-    // SIMPAN DATA BARU
-    // + VALIDASI DUPLIKASI
-    // =========================
+    
     public function simpan()
 {
     // RULE VALIDASI
@@ -54,7 +47,7 @@ class Pasien extends CI_Controller {
     $this->form_validation->set_rules('no_telp', 'Nomor Telepon', 'required');
 
     if ($this->form_validation->run() == FALSE) {
-        $this->input(); // kembali ke form input
+        $this->input(); 
         return;
     }
 
@@ -88,12 +81,6 @@ class Pasien extends CI_Controller {
     redirect('master/pasien');
 }
 
-
-
-
-    // =========================
-    // FORM EDIT
-    // =========================
     public function edit($id) {
         $pasien_data = $this->M_Pasien->get_by_id($id);
 
@@ -111,10 +98,7 @@ class Pasien extends CI_Controller {
         $this->template->load('template', $data['contents'], $data);
     }
 
-    // =========================
-    // UPDATE DATA
-    // + CEK DUPLIKASI (kecuali dirinya sendiri)
-    // =========================
+    
     public function update() {
 
         $id_pasien = $this->input->post('id_pasien', TRUE);
@@ -134,10 +118,7 @@ class Pasien extends CI_Controller {
         $tgl_lahir = $this->input->post('tgl_lahir', TRUE);
         $no_telp   = $this->input->post('no_telp', TRUE);
 
-        // ============================
-        // 🔥 VALIDASI DUPLIKASI UPDATE
-        // CEK apakah ada pasien lain dgn data sama
-        // ============================
+       
         $this->db->where('nama_pasien', $nama);
         $this->db->where('tgl_lahir', $tgl_lahir);
         $this->db->where('no_telp', $no_telp);
@@ -163,9 +144,7 @@ class Pasien extends CI_Controller {
     }
 
 
-    // =========================
-    // DELETE
-    // =========================
+    
     public function hapus($id) {
 
         $this->M_Pasien->delete_all_transaksi($id);

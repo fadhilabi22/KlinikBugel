@@ -12,7 +12,7 @@ class Riwayat_pasien extends CI_Controller {
     public function index()
 {
     $data['title'] = 'Riwayat Pasien';
-    $data['riwayat'] = $this->riwayat->get_all(); // ✔ sesuai model
+    $data['riwayat'] = $this->riwayat->get_all(); 
 
     $data['contents'] = $this->load->view(
         'transaksi/riwayat_pasien/index',

@@ -105,7 +105,7 @@
             </table>
         </div>
 
-        <!-- TOMBOL AKSI -->
+     
         <div class="no-print mt-3">
             <button class="btn btn-success" onclick="window.print()">
                 <i class="fa fa-print"></i> Cetak

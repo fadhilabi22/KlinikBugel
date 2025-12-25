@@ -9,7 +9,7 @@ class Dokter extends CI_Controller {
         $this->load->library('form_validation');
     }
 
-    // ================= LIST + SEARCH =================
+    
     public function index() {
 
         $keyword = $this->input->get('q');
@@ -29,7 +29,7 @@ class Dokter extends CI_Controller {
         $this->template->load('template', 'master/dokter/lihat_data', $data);
     }
 
-    // ================= INPUT =================
+   
     public function input() {
         $data = [
             'title' => 'Tambah Dokter'
@@ -38,13 +38,13 @@ class Dokter extends CI_Controller {
         $this->template->load('template', 'master/dokter/form_input', $data);
     }
 
-    // ================= SIMPAN =================
+    
     public function simpan() {
 
         $nama_dokter = $this->input->post('nama_dokter', TRUE);
         $no_izin     = $this->input->post('no_izin', TRUE);
 
-        // 🔒 VALIDASI DUPLIKAT
+       
         if ($this->dokter->cek_nama($nama_dokter) > 0) {
             $this->session->set_flashdata('error', 'Nama dokter sudah terdaftar!');
             redirect('master/dokter/input');
@@ -67,7 +67,7 @@ class Dokter extends CI_Controller {
         redirect('master/dokter');
     }
 
-    // ================= EDIT =================
+    
     public function edit($id) {
 
         $dokter = $this->dokter->get_by_id($id);
@@ -81,14 +81,14 @@ class Dokter extends CI_Controller {
         $this->template->load('template', 'master/dokter/form_edit', $data);
     }
 
-    // ================= UPDATE =================
+    
     public function update() {
 
         $id          = $this->input->post('id_dokter');
         $nama_dokter = $this->input->post('nama_dokter', TRUE);
         $no_izin     = $this->input->post('no_izin', TRUE);
 
-        // 🔒 VALIDASI DUPLIKAT SAAT EDIT
+        
         if ($this->dokter->cek_nama_edit($nama_dokter, $id) > 0) {
             $this->session->set_flashdata('error', 'Nama dokter sudah digunakan!');
             redirect('master/dokter/edit/'.$id);
@@ -111,7 +111,7 @@ class Dokter extends CI_Controller {
         redirect('master/dokter');
     }
 
-    // ================= HAPUS =================
+    
     public function hapus($id) {
         $this->dokter->delete($id);
         $this->session->set_flashdata('success', 'Data dokter berhasil dihapus');

@@ -15,7 +15,7 @@
                         <select class="form-control" id="id_obat_select" required style="width: 100%;">
                             <option value="">-- Cari Obat --</option>
                             <?php 
-                            // Loop data dari M_Obat->get_all()
+                            
                             if(isset($list_obat) && is_array($list_obat)):
                                 foreach($list_obat as $obat):
                                     $display_name = $obat->nama_obat . ' (' . $obat->satuan . ') - Stok: ' . $obat->stok;

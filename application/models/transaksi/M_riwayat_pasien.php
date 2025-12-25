@@ -16,7 +16,7 @@ class M_riwayat_pasien extends CI_Model {
         $this->db->join('tbl_pasien p', 'p.id_pasien = k.id_pasien');
         $this->db->join('tbl_pembayaran py', 'py.id_kunjungan = k.id_kunjungan', 'left');
 
-        // OPTIONAL: hanya yang sudah bayar
+       
         $this->db->where('py.status_bayar', 'Lunas');
 
         $this->db->order_by('py.tgl_bayar', 'DESC');

@@ -7,7 +7,7 @@ class Pembayaran extends CI_Controller {
         parent::__construct();
         date_default_timezone_set('Asia/Jakarta');
         
-        // Memuat Model-model yang diperlukan
+        
         $this->load->model('transaksi/m_pendaftaran', 'M_Pendaftaran'); 
         $this->load->model('transaksi/m_pemeriksaan', 'M_Pemeriksaan'); 
         $this->load->model('transaksi/m_pembayaran', 'M_Pembayaran');
@@ -16,10 +16,10 @@ class Pembayaran extends CI_Controller {
         
         $this->load->library('form_validation');
         $this->load->helper('url');
-        // chek_session(); 
+        
     }
 
-    // [GET] FUNGSI 1: Tampilkan Daftar Tagihan Pasien
+   
     public function index() {
         $data = [
             'title'             => 'Daftar Pasien Menunggu Pembayaran',
@@ -29,7 +29,7 @@ class Pembayaran extends CI_Controller {
         $this->template->load('template', $data['contents'], $data);
     }
     
-    // [GET] FUNGSI 2: Menampilkan Form Pembayaran berdasarkan ID Kunjungan
+    
     public function form_tagihan($id_kunjungan) {
         $tagihan = $this->M_Pembayaran->get_detail_tagihan_by_kunjungan($id_kunjungan);
 
@@ -38,10 +38,10 @@ class Pembayaran extends CI_Controller {
             redirect('transaksi/pembayaran');
         }
 
-        // Ini diperlukan untuk mengatasi PHP Warning jika rm.id_rm tidak ada di SELECT
+        
         $id_rm = isset($tagihan->id_rm) ? $tagihan->id_rm : null;
         
-        // Jika id_rm tidak ada, kita tidak bisa hitung total (walaupun harusnya ada di Model)
+        
         if (empty($id_rm)) {
              $this->session->set_flashdata('error', 'Data Rekam Medis tidak terlampir. Tidak dapat menghitung tagihan.');
             redirect('transaksi/pembayaran');
@@ -56,7 +56,7 @@ class Pembayaran extends CI_Controller {
         $this->template->load('template', $data['contents'], $data);
     }
 
-    // [POST] FUNGSI 3: Menyimpan Transaksi Pembayaran
+
     public function simpan_pembayaran() {
 
     $total_tagihan     = (int)$this->input->post('total_tagihan');
@@ -64,14 +64,14 @@ class Pembayaran extends CI_Controller {
     $jumlah_bayar      = (int)$this->input->post('jumlah_bayar');
     $metode_pembayaran = $this->input->post('metode_pembayaran');
 
-    // fallback keamanan
+    
     if (!$metode_pembayaran) {
         $metode_pembayaran = !empty($_FILES['bukti_bayar']['name'])
             ? 'transfer'
             : 'cash';
     }
 
-    // ================= VALIDASI =================
+    
     if ($metode_pembayaran == 'cash') {
 
         $this->form_validation->set_rules(
@@ -86,7 +86,7 @@ class Pembayaran extends CI_Controller {
             return;
         }
 
-    } else { // TRANSFER
+    } else { 
 
         $jumlah_bayar = $total_tagihan;
 
@@ -102,15 +102,15 @@ class Pembayaran extends CI_Controller {
 
     $id_pengguna_kasir = $this->session->userdata('id_pengguna');
 
-    // ================= UPLOAD BUKTI =================
+    
    $bukti_bayar = NULL;
 
 if (!empty($_FILES['bukti_bayar']['name'])) {
 
-    // ✅ PATH ABSOLUT (SESUAI FOLDER KAMU)
+    
     $upload_path = FCPATH . 'assets/img/buktibayar/';
 
-    // ✅ JAGA-JAGA KALAU FOLDER KEHAPUS
+    
     if (!is_dir($upload_path)) {
         mkdir($upload_path, 0777, true);
     }
@@ -120,7 +120,7 @@ if (!empty($_FILES['bukti_bayar']['name'])) {
     $config['max_size']      = 2048;
     $config['encrypt_name']  = TRUE;
 
-    // 🔄 RELOAD LIBRARY BIAR CONFIG KE-RESET
+    
     $this->load->library('upload');
     $this->upload->initialize($config);
 
@@ -136,25 +136,25 @@ if (!empty($_FILES['bukti_bayar']['name'])) {
         return;
     }
 
-    // ✅ AMBIL NAMA FILE YANG DISIMPAN
+    
     $upload_data = $this->upload->data();
     $bukti_bayar = $upload_data['file_name'];
 }
 
 
-    // ================= HITUNG KEMBALIAN =================
+    
     $kembalian = ($metode_pembayaran == 'cash')
         ? ($jumlah_bayar - $total_tagihan)
         : 0;
 
-    // ================= DATA PEMBAYARAN =================
+    
     $data_pembayaran = [
     'id_kunjungan'      => $id_kunjungan,
     'id_pengguna'       => $id_pengguna_kasir,
     'tgl_bayar'         => date('Y-m-d H:i:s'),
     'total_akhir'       => $total_tagihan,
-    'jumlah_bayar'      => $jumlah_bayar,   // ✅ FIX
-    'kembalian'         => $kembalian,       // ✅ FIX
+    'jumlah_bayar'      => $jumlah_bayar,   
+    'kembalian'         => $kembalian,       
     'metode_pembayaran' => $metode_pembayaran,
     'status_bayar'      => 'Lunas',
     'bukti_bayar'       => $bukti_bayar
@@ -168,10 +168,10 @@ if (!empty($_FILES['bukti_bayar']['name'])) {
         redirect('transaksi/pembayaran');
     }
 
-    // Update status kunjungan
+    
     $this->M_Pendaftaran->update_status($id_kunjungan, 'Selesai');
 
-    // ================= FEEDBACK =================
+    
     $this->session->set_flashdata('jumlah_bayar', $jumlah_bayar);
     $this->session->set_flashdata('kembalian', $kembalian);
 
@@ -180,7 +180,7 @@ if (!empty($_FILES['bukti_bayar']['name'])) {
 
 
     
-    // [GET] FUNGSI 4: Menampilkan Struk Pembayaran
+    
     public function cetak_struk($id_kunjungan)
 {
     $struk = $this->M_Pembayaran->get_data_struk($id_kunjungan);
@@ -197,7 +197,7 @@ if (!empty($_FILES['bukti_bayar']['name'])) {
         'struk' => $struk
     ];
 
-    // View murni (tanpa template)
+    
     $this->load->view('transaksi/pembayaran/struk_cetak', $data);
 }
 
@@ -237,7 +237,7 @@ public function laporan_pendapatan()
         $tgl_akhir = $this->input->post('tgl_akhir', TRUE);
         $keyword   = $this->input->post('keyword', TRUE);
 
-        // ================= VALIDASI =================
+        
         if (empty($tgl_awal) || empty($tgl_akhir)) {
 
             $this->session->set_flashdata(
@@ -257,7 +257,7 @@ public function laporan_pendapatan()
             $laporan = $this->M_Pembayaran
                 ->get_laporan_pendapatan($tgl_awal, $tgl_akhir, $keyword);
 
-            // ✅ VALIDASI DATA KOSONG
+            
             if (empty($laporan)) {
 
                 $this->session->set_flashdata(
@@ -282,15 +282,15 @@ public function laporan_pendapatan()
 }
 
 
-// DI Controller Pembayaran.php::export_excel()
+
 
 public function export_excel() {
     
-    // 1. Ambil input tanggal dari GET
+   
     $tgl_awal = $this->input->get('tgl_awal', TRUE);
     $tgl_akhir = $this->input->get('tgl_akhir', TRUE);
     
-    // 2. Ambil data laporan
+    
     $laporan = $this->M_Pembayaran->get_laporan_pendapatan($tgl_awal, $tgl_akhir);
     
     if (empty($laporan)) {
@@ -299,14 +299,10 @@ public function export_excel() {
         return;
     }
 
-    // ===================================================
-    // ✅ FIX KRUSIAL: MENGGUNAKAN OUTPUT BUFFERING
-    // ===================================================
     
-    // Mulai Output Buffering
     ob_start(); 
     
-    // 3. Load View ke buffer, bukan ke browser
+    
     $data = [
         'laporan' => $laporan,
         'tgl_awal' => $tgl_awal,
@@ -314,23 +310,23 @@ public function export_excel() {
     ];
     $this->load->view('transaksi/pembayaran/laporan_excel', $data);
 
-    // Ambil konten dari buffer
+    
     $content = ob_get_clean();
 
-    // 4. Set Header untuk Export HTML sebagai file Excel (.xls)
+    
     header("Content-type: application/vnd.ms-excel");
     header("content-disposition:attachment;filename=Laporan_Pendapatan_".$tgl_awal."_sd_".$tgl_akhir.".xls"); 
     
-    // 5. Cetak konten
+    
     echo $content;
     exit;
 }
 public function export_pdf() {
-    // 1. Ambil input tanggal dari GET
+    
     $tgl_awal = $this->input->get('tgl_awal', TRUE);
     $tgl_akhir = $this->input->get('tgl_akhir', TRUE);
     
-    // 2. Ambil data laporan
+   
     $laporan = $this->M_Pembayaran->get_laporan_pendapatan($tgl_awal, $tgl_akhir);
     
     if (empty($laporan)) {
@@ -339,10 +335,7 @@ public function export_pdf() {
         return;
     }
 
-    // 3. Proses data ke format PDF menggunakan FPDF
     
-    // Ganti 'pdf' dengan nama library FPDF Anda, jika sudah di-load
-    // Asumsi class FPDF bisa diakses
     $pdf = new FPDF('P', 'mm', 'A4'); 
     $pdf->AddPage();
     $pdf->SetFont('Arial', 'B', 16);
@@ -352,14 +345,14 @@ public function export_pdf() {
     $pdf->Cell(0, 5, 'Periode: ' . date('d/m/Y', strtotime($tgl_awal)) . ' s/d ' . date('d/m/Y', strtotime($tgl_akhir)), 0, 1, 'C');
     $pdf->Ln(5);
 
-    // Header Tabel
+    
     $pdf->Cell(10, 6, 'NO', 1, 0, 'C');
     $pdf->Cell(60, 6, 'NAMA PASIEN', 1, 0, 'C');
     $pdf->Cell(50, 6, 'TGL BAYAR', 1, 0, 'C');
     $pdf->Cell(40, 6, 'TOTAL TAGIHAN (Rp)', 1, 1, 'C');
 
     
-    // Isi Tabel
+    
     $pdf->SetFont('Arial', '', 9);
     $no = 1;
     $grand_total = 0;
@@ -374,13 +367,13 @@ public function export_pdf() {
 }
 
     
-    // Footer Total
+    
     $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(120, 6, 'GRAND TOTAL PENDAPATAN BERSIH', 1, 0, 'R');
     $pdf->Cell(40, 6, number_format($grand_total, 0, ',', '.'), 1, 1, 'R');
 
     
-    // Output PDF
+    
     $pdf->Output('I', 'Laporan_Pendapatan_' . date('Ymd') . '.pdf'); 
     
     exit;

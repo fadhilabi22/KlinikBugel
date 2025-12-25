@@ -1,7 +1,5 @@
 <style>
-/* =========================
-   MODE CETAK
-========================= */
+
 @media print {
 
     body * {
@@ -20,7 +18,7 @@
         width: 100%;
     }
 
-    /* sembunyikan tombol */
+  
     .no-print {
         display: none !important;
     }
@@ -30,7 +28,7 @@
     <div class="col-md-12">
         <div class="panel panel-default">
 
-            <!-- ================= HEADER ================= -->
+            
             <div class="panel-heading no-print">
                 <h3 class="panel-title">
                     <i class="fa fa-bar-chart"></i>
@@ -46,7 +44,7 @@
                     <strong>tanggal pembayaran pasien</strong>.
                 </p>
 
-                <!-- ================= FORM FILTER ================= -->
+                
                 <?= form_open('transaksi/pembayaran/laporan_pendapatan', [
                     'method' => 'post',
                     'class'  => 'form-inline no-print'
@@ -78,7 +76,7 @@
                 <?= form_close(); ?>
                 <hr class="no-print">
 
-                <!-- ================= AREA CETAK ================= -->
+               
                 <?php if (!empty($laporan)): ?>
 
                 <div class="print-area">
@@ -136,7 +134,7 @@
 
                 </div>
 
-                <!-- ================= TOMBOL ================= -->
+                
                 <?php
                     $query_params = '?tgl_awal='.$tgl_awal.'&tgl_akhir='.$tgl_akhir.'&keyword='.$keyword;
                 ?>

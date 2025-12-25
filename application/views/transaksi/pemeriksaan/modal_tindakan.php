@@ -14,16 +14,16 @@
                         <select class="form-control" id="id_tindakan_select" required style="width: 100%;">
                             <option value="">-- Cari Tindakan --</option>
                             <?php 
-                            // Asumsi $list_tindakan dikirim dari Controller
+                            
                             if(isset($list_tindakan) && is_array($list_tindakan)):
                                 foreach($list_tindakan as $tindakan):
                                     
-                                    // ✅ FIX: Ganti $tindakan->biaya menjadi $tindakan->biaya_tindakan
+                                    
                                     $biaya_murni = $tindakan->biaya_tindakan; 
                                     
                                     $display_name = $tindakan->nama_tindakan.' (Rp '.number_format($biaya_murni, 0, ',', '.').')';
                                     
-                                    // ✅ FIX: Ganti data-biaya="$tindakan->biaya"
+                                    
                                     echo '<option value="'.$tindakan->id_tindakan.'" data-biaya="'.$biaya_murni.'">'.$display_name.'</option>';
                                 endforeach;
                             endif;

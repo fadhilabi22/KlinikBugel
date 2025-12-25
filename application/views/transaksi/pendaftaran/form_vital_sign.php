@@ -21,11 +21,11 @@
                 </h4>
                 <hr>
 
-                <!-- ID KUNJUNGAN -->
+               
                 <input type="hidden" name="id_kunjungan" 
                        value="<?php echo isset($id_kunjungan) ? $id_kunjungan : ''; ?>">
 
-                <!-- ================= TENSI ================= -->
+               
                 <div class="form-group">
                     <label for="tensi">
                         <i class="fa fa-heartbeat"></i> Tekanan Darah (Tensi)
@@ -35,7 +35,7 @@
                            placeholder="Contoh: 120/80 mmHg" required>
                 </div>
 
-                <!-- ================= SUHU ================= -->
+                
                 <div class="form-group">
                     <label for="suhu">
                         <i class="fa fa-thermometer-half"></i> Suhu Tubuh (°C)
@@ -45,7 +45,7 @@
                            placeholder="Contoh: 36.5" required>
                 </div>
 
-                <!-- ================= BERAT BADAN ================= -->
+                
                 <div class="form-group">
                     <label for="bb">
                         <i class="fa fa-balance-scale"></i> Berat Badan (kg)
@@ -55,7 +55,7 @@
                            placeholder="Contoh: 65" required>
                 </div>
 
-                <!-- ================= KELUHAN ================= -->
+               
                 <div class="form-group">
                     <label for="keluhan">
                         <i class="fa fa-plus-square"></i> Keluhan Utama
@@ -64,7 +64,7 @@
                               rows="3" required><?php echo set_value('keluhan'); ?></textarea>
                 </div>
 
-                <!-- ================= SUBMIT ================= -->
+                
                 <div class="mt-4">
                     <button type="submit" class="btn btn-warning">
                         <i class="fa fa-save"></i> Simpan & Lanjut ke Dokter

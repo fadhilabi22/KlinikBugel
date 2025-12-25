@@ -9,9 +9,7 @@ class User extends CI_Controller {
         $this->load->library('form_validation');
     }
 
-    // =======================
-    // READ
-    // =======================
+    
     public function index() {
         $data = [
             'title'    => 'Manajemen User',
@@ -21,9 +19,7 @@ class User extends CI_Controller {
         $this->template->load('template', 'master/user/lihat_data', $data);
     }
 
-    // =======================
-    // FORM INPUT
-    // =======================
+   
     public function input() {
         $data = [
             'title' => 'Tambah User'
@@ -32,9 +28,7 @@ class User extends CI_Controller {
         $this->template->load('template', 'master/user/form_input', $data);
     }
 
-    // =======================
-    // SIMPAN
-    // =======================
+    
     public function simpan() {
 
         $this->form_validation->set_rules(
@@ -60,9 +54,7 @@ class User extends CI_Controller {
         }
     }
 
-    // =======================
-    // FORM EDIT
-    // =======================
+    
     public function edit($id) {
         $data = [
             'title' => 'Edit User',
@@ -72,9 +64,7 @@ class User extends CI_Controller {
         $this->template->load('template', 'master/user/form_edit', $data);
     }
 
-    // =======================
-    // UPDATE
-    // =======================
+   
     public function update() {
         $id = $this->input->post('id_pengguna');
 
@@ -92,9 +82,7 @@ class User extends CI_Controller {
         redirect('master/user');
     }
 
-    // =======================
-    // DELETE
-    // =======================
+    
     public function hapus($id) {
         $this->M_User->delete($id);
         $this->session->set_flashdata('success', 'User berhasil dihapus');

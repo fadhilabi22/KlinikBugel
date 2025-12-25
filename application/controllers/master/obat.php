@@ -11,9 +11,7 @@ class Obat extends CI_Controller {
         $this->load->library('upload'); 
     }
 
-    // ==========================================
-    // LIST DATA
-    // ==========================================
+    
     public function index() {
 
         $keyword = $this->input->get('keyword');
@@ -34,9 +32,7 @@ class Obat extends CI_Controller {
         $this->template->load('template', $data['contents'], $data);
     }
 
-    // ==========================================
-    // FORM INPUT
-    // ==========================================
+    
     public function input() {
         $data = [
             'title'     => 'Tambah Data Obat Baru',
@@ -45,9 +41,7 @@ class Obat extends CI_Controller {
         $this->template->load('template', $data['contents'], $data);
     }
 
-    // ==========================================
-    // SIMPAN DATA BARU
-    // ==========================================
+    
     public function simpan() {
 
         $this->form_validation->set_rules('nama_obat', 'Nama Obat', 'required|is_unique[tbl_obat.nama_obat]');
@@ -68,7 +62,7 @@ class Obat extends CI_Controller {
             'foto_obat'  => NULL 
         ];
         
-        // Upload Foto jika ada
+        // Upload Foto 
         if (!empty($_FILES['foto_obat']['name'])) {
 
             $config['upload_path']   = './assets/img/obat/';
@@ -97,9 +91,7 @@ class Obat extends CI_Controller {
         redirect('master/obat');
     }
 
-    // ==========================================
-    // FORM EDIT
-    // ==========================================
+    
     public function edit($id) {
         $obat_data = $this->M_Obat->get_by_id($id);
 
@@ -116,9 +108,7 @@ class Obat extends CI_Controller {
         $this->template->load('template', $data['contents'], $data);
     }
 
-    // ==========================================
-    // UPDATE DATA
-    // ==========================================
+   
     public function update() {
 
         $id_obat = $this->input->post('id_obat', TRUE);
@@ -182,9 +172,7 @@ class Obat extends CI_Controller {
         redirect('master/obat');
     }
 
-    // ==========================================
-    // CALLBACK UNIQUE (khusus update)
-    // ==========================================
+    
     public function check_unique_nama_obat($nama_obat) {
         $id_obat = $this->input->post('id_obat', TRUE);
 
@@ -199,9 +187,7 @@ class Obat extends CI_Controller {
         return TRUE;
     }
 
-    // ==========================================
-    // HAPUS DATA + FOTO
-    // ==========================================
+   
     public function hapus($id) {
         
         $obat = $this->M_Obat->get_by_id($id);

@@ -13,9 +13,9 @@ class m_tindakan extends CI_Model {
      * @return array
      */
     public function get_all_tindakan() {
-        // SELECT * FROM tbl_tindakan
+       
         return $this->db->get($this->tbl_tindakan)->result(); 
     }
 
-    // Anda bisa menambahkan fungsi CRUD lain di sini (simpan, edit, hapus)
+    
 }

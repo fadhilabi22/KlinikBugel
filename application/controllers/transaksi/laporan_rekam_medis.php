@@ -43,9 +43,7 @@ class Laporan_rekam_medis extends CI_Controller {
         $this->load->view('template', $data);
     }
 
-   // ===============================
-// EXPORT EXCEL
-// ===============================
+  
 public function export_excel()
 {
     $tgl_awal  = $this->input->get('tgl_awal', TRUE);
@@ -63,7 +61,7 @@ public function export_excel()
         return;
     }
 
-    // ================= BUFFER =================
+    
     ob_start();
 
     $data = [
@@ -84,9 +82,7 @@ public function export_excel()
 }
 
 
-// ===============================
-// EXPORT PDF
-// ===============================
+
 public function export_pdf()
 {
     $tgl_awal  = $this->input->get('tgl_awal', TRUE);
@@ -104,8 +100,8 @@ public function export_pdf()
         return;
     }
 
-    // ================= PDF =================
-    $pdf = new FPDF('L', 'mm', 'A4'); // Landscape
+    
+    $pdf = new FPDF('L', 'mm', 'A4'); 
     $pdf->AddPage();
     $pdf->SetFont('Arial', 'B', 14);
     $pdf->Cell(0, 8, 'LAPORAN REKAM MEDIS PASIEN', 0, 1, 'C');
@@ -118,7 +114,7 @@ public function export_pdf()
     );
     $pdf->Ln(5);
 
-    // Header
+    
     $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(10, 7, 'No', 1);
     $pdf->Cell(45, 7, 'Nama Pasien', 1);
@@ -128,7 +124,7 @@ public function export_pdf()
     $pdf->Cell(69, 7, 'Catatan Medis', 1);
     $pdf->Ln();
 
-    // Data
+    
     $pdf->SetFont('Arial', '', 9);
     $no = 1;
     foreach ($laporan as $r) {

@@ -25,10 +25,10 @@
             <div class="inset">
                 
                 <?php 
-                // Menampilkan error validasi form (jika gagal input)
+                // Menampilkan error validasi form 
                 echo validation_errors('<div style="color:red; background: #fee; padding: 10px; border-radius: 4px; margin-bottom: 10px;">', '</div>');
                 
-                // Menampilkan flashdata error (misalnya: password lama salah atau user tidak ditemukan)
+                // Menampilkan flashdata error 
                 if ($this->session->flashdata('error')): ?>
                     <div style="color:red; background: #fee; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
                         <?php echo $this->session->flashdata('error'); ?>

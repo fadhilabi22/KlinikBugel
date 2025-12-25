@@ -3,9 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_laporan_rekam_medis extends CI_Model {
 
-    /* ===============================
-       AMBIL DATA PASIEN (UNTUK FILTER)
-    =============================== */
+
     public function get_pasien()
     {
         return $this->db
@@ -14,9 +12,7 @@ class M_laporan_rekam_medis extends CI_Model {
             ->result();
     }
 
-    /* ===============================
-       AMBIL DATA REKAM MEDIS
-    =============================== */
+    
     public function get_laporan($tgl_awal, $tgl_akhir, $id_pasien = null)
     {
         $this->db->select('

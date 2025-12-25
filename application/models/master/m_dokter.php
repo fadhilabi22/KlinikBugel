@@ -6,7 +6,7 @@ class M_Dokter extends CI_Model {
     private $table = 'tbl_dokter';
     private $pk    = 'id_dokter';
 
-    // ================= BASIC CRUD =================
+    
 
     public function get_all() {
         return $this->db->get($this->table)->result();
@@ -22,7 +22,7 @@ class M_Dokter extends CI_Model {
         return $this->db->insert($this->table, $data);
     }
 
-    // kompatibel sama controller
+    
     public function insert($data) {
         return $this->save($data);
     }
@@ -50,9 +50,7 @@ class M_Dokter extends CI_Model {
         return $this->db->count_all($this->table);
     }
 
-    // ================= VALIDASI DUPLIKAT =================
-
-    // tambah data
+   
     public function cek_nama($nama) {
         return $this->db->where('nama_dokter', $nama)
                         ->get($this->table)
@@ -65,7 +63,7 @@ class M_Dokter extends CI_Model {
                         ->num_rows();
     }
 
-    // edit data
+   
     public function cek_nama_edit($nama, $id) {
         return $this->db->where('nama_dokter', $nama)
                         ->where($this->pk.' !=', $id)
